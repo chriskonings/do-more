@@ -29,12 +29,17 @@ import Multiselect from 'vue-multiselect';
 
 export default {
   name: 'Search',
-  props: ['options'],
+  props: ['options', 'getActivities'],
   components: { Multiselect },
   data() {
     return {
       value: null,
     };
+  },
+  watch: {
+    value(newData) {
+      this.$emit('getActivities', newData);
+    },
   },
 };
 </script>

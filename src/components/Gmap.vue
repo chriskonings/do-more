@@ -2,17 +2,20 @@
   <div>
     <gmap-map
       :center="center"
-      :zoom="10"
+      :zoom="12"
       style="width: 100%; height: 300px"
     />
-    <GmapAutocomplete @place_changed="setPlace" />
-    <button @click="getLocation()">Current</button>
+    <GmapAutocomplete @place_changed="setPlace"/>
+    <button @click="getLocation()">Geolocation</button>
+    <PlaceSearch />
   </div>
 </template>
 
 <script>
+
 import * as VueGoogleMaps from 'vue2-google-maps';
 import Vue from 'vue';
+import PlaceSearch from './PlaceSearch';
 
 Vue.use(VueGoogleMaps, {
   load: {
@@ -29,22 +32,31 @@ export default {
       position: {},
     };
   },
+  mounted() {
+    // eslint-disable-next-line
+    console.log(VueGoogleMaps)
+  },
   methods: {
     setPlace(place) {
+      // eslint-disable-next-line
+      console.log(place)
       if (place) {
         this.center.lat = place.geometry.location.lat();
         this.center.lng = place.geometry.location.lng();
       }
     },
     getLocation() {
-      // eslint-disable-next-line
-      this.geoLocation()
+      this.geoLocation();
     },
     geoLocation() {
-      const positionOption = { timeout: 500, enableHighAccuracy: true };
-      const gpsSunccuss = (currentPosition) => {
+      const positionOption = { timeout: 10000, enableHighAccuracy: true };
+      const gpsSunccuss = (pos) => {
         // eslint-disable-next-line
-        console.log(currentPosition)
+        console.log(pos)
+        this.center = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
       };
       const gpsFailed = (err) => {
         // eslint-disable-next-line
@@ -53,5 +65,6 @@ export default {
       navigator.geolocation.getCurrentPosition(gpsSunccuss, gpsFailed, positionOption);
     },
   },
+  components: { PlaceSearch },
 };
 </script>

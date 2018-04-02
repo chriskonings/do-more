@@ -1,28 +1,38 @@
 <template>
-  <div class="hello">
-    <Search :options="activities"/>
-    <Gmap />
+  <div class="hello-world">
+    <Search :options="dbActivities" @getActivities="getActivities"/>
+    <GoogleMaps :selected="selectedActiv"/>
   </div>
 </template>
 
 <script>
 import Search from './Search';
-import Gmap from './Gmap';
 import { db } from '../main';
+import GoogleMaps from './GoogleMaps';
 
 export default {
   name: 'HelloWorld',
   data() {
     return {
-      activities: [],
+      selectedActiv: [],
+      dbActivities: [],
     };
   },
   firestore() {
     return {
-      activities: db.collection('activities'),
+      dbActivities: db.collection('activities'),
     };
   },
-  components: { Search, Gmap },
+  methods: {
+    getActivities(activities) {
+      const selectedArr = [];
+      activities.forEach((activity) => {
+        selectedArr.push(activity.name);
+      });
+      this.selectedActiv = selectedArr;
+    },
+  },
+  components: { Search, GoogleMaps },
 };
 </script>
 
