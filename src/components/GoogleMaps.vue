@@ -1,18 +1,18 @@
 <template>
   <div class="google-maps">
+    <label>Search location</label>
+    <input class="google-maps__search" ref="loc" placeholder="Search Location"/>
+    <button class="google-maps__loc" @click="searchSelected()">Search</button>
     <div class="google-maps__map" ref="map"></div>
-    <input class="google-maps__loc" ref="loc" placeholder="Search Location"/>
-    <input class="google-maps__places" ref="place" placeholder="Search Place"/>
-    <button @click="searchSelected()">Search</button>
     <div style="display: none">
-      <div id="info-content">
+      <div ref="info">
         <table>
           <tr id="iw-url-row" class="iw_table_row">
             <td id="iw-url">
               {{iw.name}}
             </td>
             <td id="iw-url">
-              <a :href="iw.url">Url</a>
+              <a :href="iw.url" target="_blank">Map</a>
             </td>
           </tr>
           <tr id="iw-address-row" class="iw_table_row">
@@ -36,6 +36,7 @@
         </table>
       </div>
     </div>
+    <div>{{errors}}</div>
   </div>
 </template>
 
@@ -44,6 +45,7 @@
 import GoogleMapsLoader from 'google-maps';
 GoogleMapsLoader.KEY = 'AIzaSyCS0KrhCnNOyW__KqWeeN-ZCC0ZuQNd3m4'
 GoogleMapsLoader.LIBRARIES = ['places'];
+import axios from 'axios';
 
 export default {
   name: 'GoogleMaps',
@@ -56,10 +58,12 @@ export default {
       currentPlace: null,
       places: null,
       infoWindow: null,
-      iw: {}
+      iw: {},
+      errors: [],
+      fullSelected: []
     };
   },
-  mounted: function () {
+  mounted() {
     this.initMap()
     this.initLocationSearch()
   },
@@ -67,12 +71,12 @@ export default {
     initMap() {
       GoogleMapsLoader.load((google) => {
         this.map = new google.maps.Map(this.$refs.map, {
-          zoom: 15,
+          zoom: 17,
           center: this.position
         })
         this.places = new google.maps.places.PlacesService(this.map);
         this.infoWindow = new google.maps.InfoWindow({
-          content: document.getElementById('info-content')
+          content: this.$refs.info
         });
       })
     },
@@ -80,6 +84,7 @@ export default {
       GoogleMapsLoader.load((google) => {
         const input = this.$refs.loc;
         var autocomplete = new google.maps.places.Autocomplete(input);
+        // autocomplete.setTypes(['regions'])
         autocomplete.addListener('place_changed', (place) => {
           var place = autocomplete.getPlace();
           var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
@@ -88,54 +93,51 @@ export default {
         });
       })
     },
-    initPlaceSearch() {
-      GoogleMapsLoader.load((google) => {
-        const input = this.$refs.place;
-        var autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.setTypes(['establishment'])
-        autocomplete.addListener('place_changed', () => {
-          var place = autocomplete.getPlace();
-        });
-      })
-    },
     searchSelected() {
-      const vm = this
-      GoogleMapsLoader.load((google) => {
+      let lastStatus = null
+      this.fullSelected = []
+      for (var i = 0; i < this.selected.length; i++) {
         var search = {
           bounds: this.map.getBounds(),
-          types: vm.selected
+          type: this.selected[i]
         };
-        console.log(vm.selected)
         this.places.nearbySearch(search, (results, status) => {
-          console.log(results)
           if (status === google.maps.places.PlacesServiceStatus.OK) {
-            vm.clearMarkers();
-            // Create a marker for each hotel found, and
-            // assign a letter of the alphabetic to each marker icon.
-            for (var i = 0; i < results.length; i++) {
-              // Use marker animation to drop the icons incrementally on the map.
-              vm.markers[i] = new google.maps.Marker({
-                position: results[i].geometry.location,
-                animation: google.maps.Animation.DROP,
-              });
-              // If the user clicks a hotel marker, show the details of that hotel
-              // in an info window.
-              vm.markers[i].placeResult = results[i];
-              google.maps.event.addListener(vm.markers[i], 'click', function() {
-                vm.places.getDetails({placeId: this.placeResult.place_id},
-                (place, status) => {
-                  if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                    return;
-                  }
-                  vm.infoWindow.open(vm.map, this);
-                  vm.buildIWContent(place);
-                });
-              });
-              vm.markers[i].setMap(vm.map);
-            }
+            this.fullSelected.push(...results)
           }
         });
-      })
+      }
+      this.placeMarkers(this.fullSelected)
+    },
+    placeMarkers(list) {
+      const vm = this
+      setTimeout(() => {
+        // vm.clearMarkers();
+        GoogleMapsLoader.load((google) => {
+        // Create a marker for each hotel found, and
+        // assign a letter of the alphabetic to each marker icon.
+          list.forEach((item, i) => {
+            // Use marker animation to drop the icons incrementally on the map.
+            vm.markers[i] = new google.maps.Marker({
+              position: item.geometry.location
+            });
+            // If the user clicks a hotel marker, show the details of that hotel
+            // in an info window.
+            vm.markers[i].placeResult = item;
+            google.maps.event.addListener(vm.markers[i], 'click', function() {
+              vm.places.getDetails({placeId: this.placeResult.place_id},
+              (place, status) => {
+                if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                  return;
+                }
+                vm.infoWindow.open(vm.map, this);
+                vm.buildIWContent(place);
+              });
+            });
+            vm.markers[i].setMap(vm.map);
+          })
+        })
+      }, 1000)
     },
     clearMarkers() {
       const vm = this
@@ -156,15 +158,25 @@ export default {
         rating: place.rating,
         website: place.website,
       }
+    },
+    activitySearch(lat, lng) {
+      axios.get(`http://api.amp.active.com/v2/search/?lat_lon=${lat}%2C+${lng}&query=running&current_page=1&per_page=10&sort=distance&exclude_children=true&api_key=vevqj4p8x76u8fg6jupgs3zf`)
+      .then(response => {
+        console.log(response.data)
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
     }
   },
 };
 </script>
 <style>
   .google-maps__map {
-    height: 500px;
+    height: 50rem;
     width: 100%;
     display: block;
+    margin: 2rem auto;
   }
 </style>
 

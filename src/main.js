@@ -10,6 +10,7 @@ import router from './router';
 Vue.config.productionTip = false;
 
 Vue.use(VueFire);
+
 firebase.initializeApp({
   projectId: 'do-more-ecc5c',
   databaseURL: 'https://do-more-ecc5c.firebaseio.com',
