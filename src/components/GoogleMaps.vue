@@ -60,7 +60,6 @@ export default {
       infoWindow: null,
       iw: {},
       errors: [],
-      fullSelected: []
     };
   },
   mounted() {
@@ -93,9 +92,10 @@ export default {
         });
       })
     },
-    searchSelected() {
-      let lastStatus = null
-      this.fullSelected = []
+    async searchSelected() {
+      const lastStatus = null
+      const list = []
+      let counter = 0
       for (var i = 0; i < this.selected.length; i++) {
         var search = {
           bounds: this.map.getBounds(),
@@ -103,53 +103,47 @@ export default {
         };
         this.places.nearbySearch(search, (results, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
-            this.fullSelected.push(...results)
+            list.push(...results)
+            counter++
+            if(counter === this.selected.length) {
+              this.placeMarkers(list)
+            }
           }
         });
       }
-      this.placeMarkers(this.fullSelected)
     },
-    placeMarkers(list) {
+    async placeMarkers(list) {
       const vm = this
-      setTimeout(() => {
-        // vm.clearMarkers();
-        GoogleMapsLoader.load((google) => {
-        // Create a marker for each hotel found, and
-        // assign a letter of the alphabetic to each marker icon.
-          list.forEach((item, i) => {
-            // Use marker animation to drop the icons incrementally on the map.
-            vm.markers[i] = new google.maps.Marker({
-              position: item.geometry.location
+      vm.clearMarkers();
+      GoogleMapsLoader.load((google) => {
+        list.forEach((item, i) => {
+          vm.markers[i] = new google.maps.Marker({
+            position: item.geometry.location
+          });
+          vm.markers[i].placeResult = item;
+          google.maps.event.addListener(vm.markers[i], 'click', function() {
+            vm.places.getDetails({placeId: this.placeResult.place_id},
+            (place, status) => {
+              if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                return;
+              }
+              vm.infoWindow.open(vm.map, this);
+              vm.buildIWContent(place);
             });
-            // If the user clicks a hotel marker, show the details of that hotel
-            // in an info window.
-            vm.markers[i].placeResult = item;
-            google.maps.event.addListener(vm.markers[i], 'click', function() {
-              vm.places.getDetails({placeId: this.placeResult.place_id},
-              (place, status) => {
-                if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                  return;
-                }
-                vm.infoWindow.open(vm.map, this);
-                vm.buildIWContent(place);
-              });
-            });
-            vm.markers[i].setMap(vm.map);
-          })
+          });
+          vm.markers[i].setMap(vm.map);
         })
-      }, 1000)
+      })
     },
     clearMarkers() {
-      const vm = this
-      for (var i = 0; i < vm.markers.length; i++) {
-        if (vm.markers[i]) {
-          vm.markers[i].setMap(null);
+      for (var i = 0; i < this.markers.length; i++) {
+        if (this.markers[i]) {
+          this.markers[i].setMap(null);
         }
       }
-      vm.markers = [];
+      this.markers = [];
     },
     buildIWContent(place) {
-      console.log(place)
       this.iw ={
         name: place.name,
         url: place.url,
