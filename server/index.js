@@ -1,11 +1,10 @@
 'use strict';
 
-import config from 'config'
-
+const config = require("./config.js");
 const express = require('express')
 const app = express()
 const yelp = require('yelp-fusion');
-const client = yelp.client(config.YELP_KEY);
+const client = yelp.client(config.keys.YELP);
 
 app.get('/api', function(req, res) {
   const {lat, lng, limit} = req.query
