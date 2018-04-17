@@ -1,0 +1,12 @@
+{
+  "activities": [
+    {"name": "food"},
+    {"name": "shop"},
+    {"name": "cinema"},
+    {"name": "movie theatre"},
+    {"name": "bouldering"},
+    {"name": "snowboarding"},
+    {"name": "climbing"},
+    {"name": "monument"}
+  ]
+}

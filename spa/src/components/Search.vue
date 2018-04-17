@@ -12,7 +12,7 @@
       placeholder="Pick some"
       label="name"
       track-by="name"
-      :preselect-first="true"
+      :preselect-first="false"
     >
       <template slot="tag" slot-scope="props"><span>
         <span>{{ props.option.name }}</span>
@@ -20,7 +20,7 @@
         </span>
       </template>
     </multiselect>
-    <ul><li v-for="{ name, i } in value" :key="i">{{ name }}</li></ul>
+    <!-- <ul><li v-for="{ name, i } in value" :key="i">{{ name }}</li></ul> -->
   </div>
 </template>
 
