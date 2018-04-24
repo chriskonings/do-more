@@ -8,7 +8,7 @@
 <script>
 /* eslint-disable */
 export default {
-  name: 'placeSearch',
+  name: 'LocationSearch',
   props: ['gMapsLoader', 'map'],
   mounted() {
     this.initLocationSearch();

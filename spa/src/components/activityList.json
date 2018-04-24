@@ -1,7 +1,10 @@
 {
   "activities": [
+    {"name": "park"},
+    {"name": "garden"},
+    {"name": "pub"},
     {"name": "food"},
-    {"name": "shop"},
+    {"name": "shopping center"},
     {"name": "cinema"},
     {"name": "movie theatre"},
     {"name": "bouldering"},

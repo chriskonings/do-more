@@ -13,7 +13,7 @@
 import utils from './utils'
 
 export default {
-  name: 'GoogleMaps',
+  name: 'Map',
   props: ['gMapsLoader', 'selected', 'emitMap', 'markers'],
   data() {
     return {
@@ -25,27 +25,32 @@ export default {
   },
   mounted() {
     this.initMap()
+    this.getLocation()
   },
   methods: {
     initMap() {
+      const vm = this
       this.gMapsLoader.load((google) => {
         this.map = new google.maps.Map(this.$refs.map, {
           zoom: 17,
-          center: this.position
+          center: this.position,
         })
+        google.maps.event.addListener(this.map, 'click', function(event) {
+          vm.$emit('addToItinerary', event.placeId);
+        });
         this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
       })
     },
     getLocation () {
       if (navigator.geolocation) {
-        var options = {
+        const options = {
           enableHighAccuracy: true,
           timeout: 5000,
           maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition((pos) => {
-          var crd = pos.coords;
-          var panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
+          const crd = pos.coords;
+          const panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
           this.map.panTo(panPoint)
         }, (err) => {
           console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -53,12 +58,13 @@ export default {
       }
     },
     whereToGo () {
-      console.log(this.markers)
       const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()])
       const yourPlace = utils.calcPrimeLocation(markerPositions)
       if (yourPlace) {
+        const panPoint = new google.maps.LatLng(yourPlace[0], yourPlace[1]);
         this.yourPin.setPosition({lat: yourPlace[0], lng: yourPlace[1]});
         this.yourPin.setMap(this.map);
+        this.map.panTo(panPoint)
       } else {
         this.yourPin.setMap(null);
       }

@@ -28,7 +28,7 @@
 import Multiselect from 'vue-multiselect';
 
 export default {
-  name: 'Search',
+  name: 'ActivitySelect',
   props: ['options', 'getActivities'],
   components: { Multiselect },
   data() {
