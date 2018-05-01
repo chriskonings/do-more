@@ -1,17 +1,20 @@
 <template>
   <div class="iw">
-    <table>
+    <table v-if="place">
       <tr id="iw-url-row" class="iw_table_row">
-        <td id="iw-url">
-        {{name}}
+        <td id="iw-name">
+        {{place.name}}
         </td>
       </tr>
       <tr id="iw-phone-row" class="iw_table_row">
-        <td id="iw-phone">{{phone}}</td>
+        <td id="iw-phone">{{place.phone}}</td>
       </tr>
       <tr id="iw-url-row" class="iw_table_row">
         <td id="iw-url">
-          <a :href="url" target="_blank">Yelp link</a>
+          <a :href="place.url" target="_blank">Yelp link</a>
+        </td>
+        <td id="iw-link">
+          <button @click.prevent="addToItinerary(place)">Add to itinerary</button>
         </td>
       </tr>
     </table>
@@ -22,7 +25,7 @@
 /* eslint-disable */
 export default {
   name: 'Itinerary',
-  props: ['name', 'phone', 'url'],
+  props: ['place', 'addToItinerary'],
   mounted() {
 
   },

@@ -15,7 +15,11 @@
     >
       Search
     </button>
-    <InfoWindow ref="info" :name="iw.name" :phone="iw.phone" :urk="iw.url"/>
+    <InfoWindow
+      ref="info"
+      :place="iw"
+      :addToItinerary="addToItinerary"
+    />
   </div>
 </template>
 
@@ -48,6 +52,9 @@ export default {
   },
 
   methods: {
+    addToItinerary (place) {
+      this.$emit('emitPlaces', place)
+    },
     async clearMarkers(markers) {
       const vm = this
       return new Promise(function (success, reject){
@@ -62,7 +69,6 @@ export default {
       this.searching = true
       await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
-      this.$emit('emitPlaces', fullResults)
       await this.placeYelpMarkers(fullResults)
     },
     async buildList () {
@@ -112,7 +118,7 @@ export default {
           vm.markers[i].placeResult = list[i];
           google.maps.event.addListener(vm.markers[i], 'click', function() {
             vm.infoWindow.open(vm.map, this);
-            vm.buildIWContent(list[i])
+            vm.iw = list[i]
           });
           vm.markers[i].setMap(vm.map);
         }
@@ -127,14 +133,6 @@ export default {
         bounds.extend(this.markers[i].getPosition());
       }
       this.map.fitBounds(bounds);
-    },
-    buildIWContent(place) {
-      this.iw = {
-        name: place.name,
-        url: place.url,
-        phone: place.phone,
-        rating: place.rating,
-      }
     },
     async getMapRadius () {
       let radius;

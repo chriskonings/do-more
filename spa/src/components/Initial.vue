@@ -22,7 +22,7 @@
       :selected="selectedActiv"
       :gMapsLoader="googleMapsLoader"
     />
-    <Itinerary :places="globalItinerary"/>
+    <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
   </div>
 </template>
 
@@ -68,9 +68,9 @@ export default {
     updateMarkers(newMarkers) {
       this.globalMarkers = newMarkers;
     },
-    updatePlaces(newPlaces) {
-      this.globalPlaces = newPlaces;
-      this.globalItinerary.push(this.globalPlaces);
+    updatePlaces(newPlace) {
+      this.globalPlace = newPlace;
+      this.globalItinerary.push(this.globalPlace);
     },
     updateItinerary(id) {
       const vm = this;
