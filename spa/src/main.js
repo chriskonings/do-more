@@ -6,6 +6,7 @@ import 'firebase/firestore';
 import Vue from 'vue';
 import App from './App';
 import router from './router';
+import './assets/styles/main.scss';
 
 Vue.config.productionTip = false;
 

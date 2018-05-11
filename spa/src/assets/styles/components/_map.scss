@@ -1,0 +1,45 @@
+/*
+ * components/_map.scss
+ */
+
+.c-map {
+  position: relative;
+  height: 100%;
+  border: 1rem solid #D8D8D8;
+}
+
+.c-map__btns {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 999;
+}
+
+.c-map__location-btn {
+  position: relative;
+  cursor: pointer;
+  background-color: #2E2E2E;
+  border-radius: 50%;
+  border: 0;
+  height: 3rem;
+  width: 3rem;
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.75);
+}
+
+.c-map__location-btn-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.c-map__canvas {
+  height: 100%;
+  width: 100%;
+  display: block;
+  .gmnoprint {
+    right: 50px;
+  }
+}

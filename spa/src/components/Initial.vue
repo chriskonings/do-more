@@ -1,28 +1,46 @@
 <template>
-  <div class="hello-world">
-    <ActivitySelect
+  <div class="o-root">
+    <main class="o-main">
+      <div class="c-user">
+        <div class="c-user__icon">
+        </div>
+        <h2 class="c-user__name">
+          Chris Konings
+        </h2>
+        <a class="c-user__logout">
+          Logout
+        </a>
+      </div>
+      <div class="c-status">
+        <p>You don’t have any plans today.</p>
+        <small>Why tho?</small>
+      </div>
+      <ActivitySelect
       :options="options"
       @getActivities="getActivities"
-    />
-    <LocationSearch
+      />
+      <LocationSearch
       :gMapsLoader="googleMapsLoader"
       :map="globalMap"
-    />
-    <FindPlaces
+      />
+      <FindPlaces
       @emitMarkers="updateMarkers"
       @emitPlaces="updatePlaces"
       :selected="selectedActiv"
       :map="globalMap"
       :gMapsLoader="googleMapsLoader"
-    />
-    <Map
-      :markers="globalMarkers"
-      @emitMap="updateMap"
-      @addToItinerary="updateItinerary"
-      :selected="selectedActiv"
-      :gMapsLoader="googleMapsLoader"
-    />
-    <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
+      />
+      <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
+    </main>
+    <aside class="o-aside">
+      <Map
+        :markers="globalMarkers"
+        @emitMap="updateMap"
+        @addToItinerary="updateItinerary"
+        :selected="selectedActiv"
+        :gMapsLoader="googleMapsLoader"
+      />
+    </aside>
   </div>
 </template>
 
@@ -87,21 +105,3 @@ export default {
   components: { ActivitySelect, LocationSearch, FindPlaces, Map, Itinerary },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

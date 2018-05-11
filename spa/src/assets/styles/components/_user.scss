@@ -1,0 +1,20 @@
+/*
+ * components/_user.scss
+ */
+
+.c-user {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+}
+
+.c-user__icon {
+  border-radius: 50%;
+  height: 4rem;
+  width: 4rem;
+  background-color: #2E2E2E;
+}
+
+.c-user__name {
+  margin: 0 1rem;
+}

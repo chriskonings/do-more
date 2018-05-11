@@ -47,7 +47,7 @@ export default {
       iw: {},
       limit: 2,
       radius: 0,
-      sortBy: 'best_match'
+      sortBy: 'distance'
     };
   },
 
