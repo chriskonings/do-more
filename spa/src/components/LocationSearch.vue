@@ -1,7 +1,7 @@
 <template>
-  <div class="google-maps">
-    <label>Location</label>
-    <input class="google-maps__search" ref="loc" placeholder="Search Location"/>
+  <div>
+    <label class="c-label">Where?</label>
+    <input class="c-text-input" ref="loc" placeholder="Search Location"/>
   </div>
 </template>
 
@@ -29,15 +29,6 @@ export default {
   },
 };
 </script>
-<style>
-  .google-maps__map {
-    height: 50rem;
-    width: 100%;
-    display: block;
-    margin: 2rem auto;
-  }
-</style>
-
 
 
 

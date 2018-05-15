@@ -1,0 +1,17 @@
+/*
+ * components/_buttons.scss
+ */
+
+.c-btn {
+  cursor: pointer;
+  background-color: #2e2e2e;
+  color: #f7f7f7;
+  border: .2rem solid transparent;
+  padding: .6rem 1.2rem;
+  transition: .3s ease;
+  &:hover {
+    border: .2rem solid #2e2e2e;
+    color: #2e2e2e;
+    background-color: #f7f7f7;
+  }
+}

@@ -1,7 +1,7 @@
 <!-- Vue component -->
 <template>
   <div>
-    <label>Simple select / dropdown</label>
+    <label class="c-label">What do you want to do?</label>
     <multiselect v-model="value"
       :options="options"
       :multiple="true"
@@ -13,12 +13,23 @@
       label="name"
       track-by="name"
       :preselect-first="false"
+      class="c-multiselect-custom"
     >
-      <template slot="tag" slot-scope="props"><span>
-        <span>{{ props.option.name }}</span>
-        <span class="custom__remove" @click="props.remove(props.option)">❌</span>
+      <div
+       slot="tag"
+       slot-scope="props"
+       class="c-multiselect-custom__tag"
+       >
+        <span class="c-multiselect-custom__tag-name">
+          {{ props.option.name }}
         </span>
-      </template>
+        <span
+          @click="props.remove(props.option)"
+          class="c-multiselect-custom__tag-remove"
+        >
+          &#10005;
+        </span>
+      </div>
     </multiselect>
     <!-- <ul><li v-for="{ name, i } in value" :key="i">{{ name }}</li></ul> -->
   </div>
@@ -45,6 +56,3 @@ export default {
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-
-<style>
-</style>

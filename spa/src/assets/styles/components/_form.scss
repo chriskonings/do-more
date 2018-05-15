@@ -1,0 +1,28 @@
+/*
+ * components/_form.scss
+ */
+
+.c-form {
+  display: flex;
+  flex-flow: column;
+}
+
+.c-form--menu {
+  padding: 1rem;
+}
+
+.c-form-item {
+  display: flex;
+  flex-flow: column;
+  margin-top: .5rem;
+}
+
+.c-label {
+
+}
+
+.c-text-input {
+  margin-top: .5rem;
+  padding-left: .5rem;
+  height: 3rem;
+}

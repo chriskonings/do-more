@@ -3,6 +3,8 @@
  */
 
 .o-main {
+  display: flex;
+  flex-flow: column;
   flex: 1;
   background: #EFEFEF;
 }

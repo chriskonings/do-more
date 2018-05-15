@@ -11,25 +11,43 @@
           Logout
         </a>
       </div>
-      <div class="c-status">
-        <p>You don’t have any plans today.</p>
+      <div class="c-status c-status--empty">
+        <span>You don’t have any plans today.</span>
         <small>Why tho?</small>
       </div>
-      <ActivitySelect
-      :options="options"
-      @getActivities="getActivities"
-      />
-      <LocationSearch
-      :gMapsLoader="googleMapsLoader"
-      :map="globalMap"
-      />
-      <FindPlaces
-      @emitMarkers="updateMarkers"
-      @emitPlaces="updatePlaces"
-      :selected="selectedActiv"
-      :map="globalMap"
-      :gMapsLoader="googleMapsLoader"
-      />
+      <div class="c-menu">
+        <ul class="c-menu__tabs">
+          <li class="c-menu__tab">
+            <button class="c-menu__tab-btn c-menu__tab-btn--is-active">
+              Places
+            </button>
+          </li>
+          <li class="c-menu__tab">
+            <button class="c-menu__tab-btn">Itineraries</button>
+          </li>
+        </ul>
+        <div class="c-menu__cont">
+          <form class="c-form c-form--menu">
+            <LocationSearch
+            class="c-form-item"
+            :gMapsLoader="googleMapsLoader"
+            :map="globalMap"
+            />
+            <ActivitySelect
+            class="c-form-item"
+            :options="options"
+            @getActivities="getActivities"
+            />
+            <FindPlaces
+            @emitMarkers="updateMarkers"
+            @emitPlaces="updatePlaces"
+            :selected="selectedActiv"
+            :map="globalMap"
+            :gMapsLoader="googleMapsLoader"
+            />
+          </form>
+        </div>
+      </div>
       <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
     </main>
     <aside class="o-aside">

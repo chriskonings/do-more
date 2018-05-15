@@ -1,0 +1,39 @@
+/*
+ * components/_accordion.scss
+ */
+
+.c-accordion {
+  margin: 1rem 0;
+}
+
+.c-accordion__btn {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  &:after {
+    content: '\25B2';
+    display: inline-block;
+    margin-left: .5rem;
+    transition: .3s ease;
+  }
+  &.is-active {
+    &:after {
+      transform: rotate(180deg)
+    }
+  }
+}
+
+.c-accordion__drawer {
+  padding: 1rem 0;
+  max-height: 999rem;
+  overflow: hidden;
+  &.slide-enter-active, &.slide-leave-active {
+    transition: .3s ease;
+  }
+  &.slide-enter, &.slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    max-height: 0;
+    padding: 0;
+    opacity: 0;
+  }
+}

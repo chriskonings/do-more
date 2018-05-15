@@ -1,0 +1,40 @@
+/*
+ * components/_multiselect.scss
+ */
+
+.c-multiselect-custom {
+  cursor: pointer;
+  margin-top: .5rem;
+  font-size: 0.875em !important;
+}
+
+.multiselect__tags {
+  padding: .5rem !important;
+  border-radius: 0 !important;
+}
+
+.multiselect, .multiselect__input, .multiselect__single {
+  font-size: inherit !important;
+}
+
+.multiselect__option--highlight {
+  background-color: #2e2e2e !important;
+  &:after {
+    background-color: #2e2e2e !important;
+  }
+}
+
+.c-multiselect-custom__tag {
+  border: .1rem solid black;
+  display: inline-block;
+  padding: .3rem;
+  margin-right: .5rem;
+}
+
+.c-multiselect-custom__tag-name {
+
+}
+
+.c-multiselect-custom__tag-remove {
+
+}

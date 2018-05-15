@@ -1,20 +1,25 @@
 <template>
   <div>
-    <label>Limit</label>
-    <input id="number" type="number" v-model="limit">
-    <select v-model="sortBy">
-      <option value="distance">Distance</option>
-      <option value="best_match">Best Match</option>
-      <option value="rating">Rating</option>
-      <option value="review_count">Review Count</option>
-    </select>
-    <label>Find places</label>
-    <button
-      :disabled="searching"
-      @click="searchSelected"
-    >
-      Search
-    </button>
+    <Accordion label="Filter">
+      <label>Order by:</label>
+      <select v-model="sortBy">
+        <option value="distance">Distance</option>
+        <option value="best_match">Best Match</option>
+        <option value="rating">Rating</option>
+        <option value="review_count">Review Count</option>
+      </select>
+      <label>At a time:</label>
+      <input id="number" type="number" v-model="limit">
+    </Accordion>
+    <div class="u-txt-center">
+      <button
+        :disabled="searching"
+        @click="searchSelected"
+        class="c-btn"
+      >
+        Search
+      </button>
+    </div>
     <InfoWindow
       ref="info"
       :place="iw"
@@ -28,6 +33,7 @@
 import utils from './utils'
 import axios from 'axios'
 import InfoWindow from './InfoWindow'
+import Accordion from './Accordion'
 
 function sortThenLimit (arr, limit) {
   const sort = arr.sort(function (a, b) {
@@ -44,7 +50,7 @@ export default {
       markers: [],
       searching: false,
       places: null,
-      iw: {},
+      iw: null,
       limit: 2,
       radius: 0,
       sortBy: 'distance'
@@ -69,6 +75,7 @@ export default {
       this.searching = true
       await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
+      console.log(fullResults)
       await this.placeYelpMarkers(fullResults)
     },
     async buildList () {
@@ -149,7 +156,6 @@ export default {
     updateSearchMap () {
       this.gMapsLoader.load((google) => {
         this.places = new google.maps.places.PlacesService(this.map);
-        console.log(this.$refs.info.$el)
         this.infoWindow = new google.maps.InfoWindow({
           content: this.$refs.info.$el
         });
@@ -164,7 +170,7 @@ export default {
       this.updateSearchMap()
     }
   },
-  components: {InfoWindow}
+  components: {InfoWindow, Accordion}
 };
 </script>
 <style lang="scss" scoped>
