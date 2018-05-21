@@ -38,13 +38,22 @@ export default {
           zoom: 17,
           center: this.position,
           mapTypeControl: false,
-          suppressInfoWindows: true,
         })
         const service = new google.maps.places.PlacesService(vm.map);
         google.maps.event.addListener(vm.map, 'click', function(event) {
-          console.log(this)
-          vm.infoWindow.el.open(vm.map, this);
+          if (event.placeId) {
+            event.stop();
+            // this.calculateAndDisplayRoute(event.placeId);
+            // this.getPlaceInformation(event.placeId);
+          }
           service.getDetails({placeId: event.placeId}, function(place, status) {
+            var marker = new google.maps.Marker({
+              position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
+              map: vm.map,
+              title: place.name,
+              visible: false,
+            });
+            vm.infoWindow.el.open(vm.map, marker);
             if (status === 'OK') {
               vm.infoWindow.content = {
                 name: place.name,

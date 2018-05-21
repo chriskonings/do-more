@@ -81,6 +81,7 @@ export default {
         }
         return list;
       } else {
+        this.searching = false
         console.log('nothing selected');
       }
     },
