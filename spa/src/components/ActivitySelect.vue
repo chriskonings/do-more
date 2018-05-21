@@ -7,12 +7,14 @@
       :multiple="true"
       :close-on-select="true"
       :clear-on-select="true"
-      :hide-selected="true"
+      :hide-selected="false"
       :preserve-search="true"
       placeholder="Pick some"
       label="name"
       track-by="name"
       :preselect-first="false"
+      :limit="3"
+      :showLabels="true"
       class="c-multiselect-custom"
     >
       <div

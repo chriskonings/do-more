@@ -24,17 +24,29 @@
   }
 }
 
+.multiselect__tags-wrap {
+
+}
+
 .c-multiselect-custom__tag {
-  border: .1rem solid black;
   display: inline-block;
-  padding: .3rem;
   margin-right: .5rem;
 }
 
 .c-multiselect-custom__tag-name {
-
+  border: .1rem solid black;
+  border-right: 0;
+  padding: .3rem;
 }
 
 .c-multiselect-custom__tag-remove {
-
+  background-color: #2e2e2e;
+  color: #efefef;
+  border: .1rem solid transparent;
+  padding: .3rem;
+  &:hover {
+    background-color: #efefef;
+    color: #2e2e2e;
+    border: .1rem solid #2e2e2e;
+  }
 }

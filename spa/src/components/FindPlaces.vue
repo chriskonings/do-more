@@ -12,7 +12,9 @@
       <input id="number" type="number" v-model="limit">
     </Accordion>
     <div class="u-txt-center">
+      <div v-if="searching" class="spinner"></div>
       <button
+        v-else
         :disabled="searching"
         @click="searchSelected"
         class="c-btn"
@@ -20,11 +22,6 @@
         Search
       </button>
     </div>
-    <InfoWindow
-      ref="info"
-      :place="iw"
-      :addToItinerary="addToItinerary"
-    />
   </div>
 </template>
 
@@ -32,7 +29,6 @@
 /* eslint-disable */
 import utils from './utils'
 import axios from 'axios'
-import InfoWindow from './InfoWindow'
 import Accordion from './Accordion'
 
 function sortThenLimit (arr, limit) {
@@ -44,13 +40,12 @@ function sortThenLimit (arr, limit) {
 
 export default {
   name: 'FindPlaces',
-  props: ['gMapsLoader', 'map', 'selected'],
+  props: ['gMapsLoader', 'map', 'selected', 'infoWindow', 'iw'],
   data() {
     return {
       markers: [],
       searching: false,
       places: null,
-      iw: null,
       limit: 2,
       radius: 0,
       sortBy: 'distance'
@@ -58,9 +53,6 @@ export default {
   },
 
   methods: {
-    addToItinerary (place) {
-      this.$emit('emitPlaces', place)
-    },
     async clearMarkers(markers) {
       const vm = this
       return new Promise(function (success, reject){
@@ -75,8 +67,8 @@ export default {
       this.searching = true
       await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
-      console.log(fullResults)
       await this.placeYelpMarkers(fullResults)
+      this.searching = false
     },
     async buildList () {
       const lastStatus = null;
@@ -87,10 +79,8 @@ export default {
           const places = await this.getYelpPlaces(this.selected[i], this.limit, radius, this.sortBy);
           list.push(...places);
         }
-        this.searching = false
         return list;
       } else {
-        this.searching = false;
         console.log('nothing selected');
       }
     },
@@ -124,8 +114,9 @@ export default {
           });
           vm.markers[i].placeResult = list[i];
           google.maps.event.addListener(vm.markers[i], 'click', function() {
-            vm.infoWindow.open(vm.map, this);
-            vm.iw = list[i]
+            console.log(this)
+            vm.infoWindow.el.open(vm.map, this);
+            vm.infoWindow.content = list[i]
           });
           vm.markers[i].setMap(vm.map);
         }
@@ -156,9 +147,6 @@ export default {
     updateSearchMap () {
       this.gMapsLoader.load((google) => {
         this.places = new google.maps.places.PlacesService(this.map);
-        this.infoWindow = new google.maps.InfoWindow({
-          content: this.$refs.info.$el
-        });
       })
     },
   },
@@ -170,7 +158,7 @@ export default {
       this.updateSearchMap()
     }
   },
-  components: {InfoWindow, Accordion}
+  components: {Accordion}
 };
 </script>
 <style lang="scss" scoped>

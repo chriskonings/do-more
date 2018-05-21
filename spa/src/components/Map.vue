@@ -17,7 +17,7 @@ import utils from './utils'
 
 export default {
   name: 'Map',
-  props: ['gMapsLoader', 'selected', 'emitMap', 'markers'],
+  props: ['gMapsLoader', 'selected', 'emitMap', 'markers', 'infoWindow'],
   data() {
     return {
       position: { lat: 0, lng: 0 },
@@ -34,13 +34,25 @@ export default {
     initMap() {
       const vm = this
       this.gMapsLoader.load((google) => {
-        this.map = new google.maps.Map(this.$refs.map, {
+        vm.map = new google.maps.Map(this.$refs.map, {
           zoom: 17,
           center: this.position,
           mapTypeControl: false,
+          suppressInfoWindows: true,
         })
-        google.maps.event.addListener(this.map, 'click', function(event) {
-          vm.$emit('addToItinerary', event.placeId);
+        const service = new google.maps.places.PlacesService(vm.map);
+        google.maps.event.addListener(vm.map, 'click', function(event) {
+          console.log(this)
+          vm.infoWindow.el.open(vm.map, this);
+          service.getDetails({placeId: event.placeId}, function(place, status) {
+            if (status === 'OK') {
+              vm.infoWindow.content = {
+                name: place.name,
+                phone: place.formatted_phone_number,
+                place: place
+              }
+            }
+          });
         });
         this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
       })

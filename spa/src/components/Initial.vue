@@ -18,47 +18,64 @@
       <div class="c-menu">
         <ul class="c-menu__tabs">
           <li class="c-menu__tab">
-            <button class="c-menu__tab-btn c-menu__tab-btn--is-active">
+            <button
+              @click="menu.places = true"
+              class="c-menu__tab-btn c-menu__tab-btn--is-active"
+            >
               Places
             </button>
           </li>
           <li class="c-menu__tab">
-            <button class="c-menu__tab-btn">Itineraries</button>
+            <button
+              class="c-menu__tab-btn"
+              @click="menu.places = false"
+            >
+              Itineraries
+            </button>
           </li>
         </ul>
         <div class="c-menu__cont">
-          <form class="c-form c-form--menu">
-            <LocationSearch
-            class="c-form-item"
-            :gMapsLoader="googleMapsLoader"
-            :map="globalMap"
-            />
-            <ActivitySelect
-            class="c-form-item"
-            :options="options"
-            @getActivities="getActivities"
-            />
-            <FindPlaces
-            @emitMarkers="updateMarkers"
-            @emitPlaces="updatePlaces"
-            :selected="selectedActiv"
-            :map="globalMap"
-            :gMapsLoader="googleMapsLoader"
-            />
-          </form>
+          <template v-if="menu.places">
+            <form class="c-form c-form--menu">
+              <LocationSearch
+              class="c-form-item"
+              :gMapsLoader="googleMapsLoader"
+              :map="globalMap"
+              />
+              <ActivitySelect
+              class="c-form-item"
+              :options="options"
+              @getActivities="getActivities"
+              />
+              <FindPlaces
+              @emitMarkers="updateMarkers"
+              :selected="selectedActiv"
+              :map="globalMap"
+              :gMapsLoader="googleMapsLoader"
+              :infoWindow="infoWindow"
+              />
+            </form>
+          </template>
+          <template v-else>
+            <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
+          </template>
         </div>
       </div>
-      <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
     </main>
     <aside class="o-aside">
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
-        @addToItinerary="updateItinerary"
         :selected="selectedActiv"
         :gMapsLoader="googleMapsLoader"
+        :infoWindow="infoWindow"
       />
     </aside>
+    <InfoWindow
+      ref="info"
+      :place="infoWindow.content"
+      :addToItinerary="updatePlaces"
+    />
   </div>
 </template>
 
@@ -71,6 +88,7 @@ import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import Itinerary from './Itinerary';
+import InfoWindow from './InfoWindow';
 
 gm.KEY = 'AIzaSyCS0KrhCnNOyW__KqWeeN-ZCC0ZuQNd3m4';
 gm.LIBRARIES = ['places', 'geometry'];
@@ -79,6 +97,13 @@ export default {
   name: 'Initial',
   data() {
     return {
+      menu: {
+        places: true,
+      },
+      infoWindow: {
+        el: null,
+        content: null,
+      },
       googleMapsLoader: gm,
       globalMap: null,
       selectedActiv: [],
@@ -93,6 +118,13 @@ export default {
   //     dbActivities: db.collection('activities'),
   //   };
   // },
+  created() {
+    this.googleMapsLoader.load((google) => {
+      this.infoWindow.el = new google.maps.InfoWindow({
+        content: this.$refs.info.$el,
+      });
+    });
+  },
   methods: {
     getActivities(activities) {
       const map = activities.map(activity => activity.name);
@@ -120,6 +152,6 @@ export default {
       });
     },
   },
-  components: { ActivitySelect, LocationSearch, FindPlaces, Map, Itinerary },
+  components: { ActivitySelect, LocationSearch, FindPlaces, Map, Itinerary, InfoWindow },
 };
 </script>
