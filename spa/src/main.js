@@ -1,23 +1,28 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import VueFire from 'vuefire';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 import Vue from 'vue';
+import gm from 'google-maps';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import App from './App';
 import router from './router';
 import './assets/styles/main.scss';
 
-Vue.config.productionTip = false;
+const config = require('../../config.js');
 
-Vue.use(VueFire);
+gm.KEY = config.keys.GOOGLEMAPS;
+gm.LIBRARIES = ['places', 'geometry'];
 
 firebase.initializeApp({
-  projectId: 'do-more-ecc5c',
+  apiKey: config.keys.FIREBASE,
+  authDomain: 'do-more-ecc5c.firebaseapp.com',
   databaseURL: 'https://do-more-ecc5c.firebaseio.com',
+  projectId: 'do-more-ecc5c',
+  storageBucket: 'do-more-ecc5c.appspot.com',
+  messagingSenderId: '669577878898',
 });
-// eslint-disable-next-line
-export const db = firebase.firestore();
+
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({

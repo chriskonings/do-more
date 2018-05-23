@@ -1,23 +1,21 @@
 <template>
-  <div class="iw">
-    <table v-if="place">
-      <tr id="iw-url-row" class="iw_table_row">
-        <td id="iw-name">
-        {{place.name}}
-        </td>
-      </tr>
-      <tr id="iw-phone-row" class="iw_table_row">
-        <td id="iw-phone">{{place.phone}}</td>
-      </tr>
-      <tr id="iw-url-row" class="iw_table_row">
-        <td id="iw-url">
-          <a :href="place.url" target="_blank">Yelp link</a>
-        </td>
-        <td id="iw-link">
-          <button @click.prevent="addToItinerary(place)">Add to itinerary</button>
-        </td>
-      </tr>
-    </table>
+  <div class="c-info-window">
+    <template v-if="place">
+      <img class="c-info-window__img" :src="place.image_url" alt="place-photo"/>
+      <b class="c-info-window__title">{{place.name}}</b>
+      <ul class="c-info-window__links">
+        <li class="c-info-window__link">
+          <a class="c-btn c-btn--link" :href="place.url" target="_blank">
+            Link
+          </a>
+        </li>
+        <li class="c-info-window__link">
+          <button class="c-btn c-btn--link" @click.prevent="addToItinerary(place)">
+            Add to itinerary
+          </button>
+        </li>
+      </ul>
+    </template>
   </div>
 </template>
 
@@ -26,16 +24,12 @@
 export default {
   name: 'Itinerary',
   props: ['place', 'addToItinerary'],
-  mounted() {
-
-  },
-  methods: {
-
-  },
 };
 </script>
 <style lang="scss" scoped>
-
+  .iw {
+    max-width: 10rem;
+  }
 </style>
 
 

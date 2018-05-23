@@ -47,6 +47,7 @@ export default {
             // this.getPlaceInformation(event.placeId);
           }
           service.getDetails({placeId: event.placeId}, function(place, status) {
+            console.log(place)
             var marker = new google.maps.Marker({
               position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
               map: vm.map,
@@ -58,7 +59,11 @@ export default {
               vm.infoWindow.content = {
                 name: place.name,
                 phone: place.formatted_phone_number,
-                place: place
+                place: place,
+                url: place.url,
+                image_url: typeof place.photos !== 'undefined'
+                    ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+                    : ''
               }
             }
           });

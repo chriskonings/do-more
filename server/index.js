@@ -1,9 +1,9 @@
 'use strict';
 
-const config = require("./config.js");
 const express = require('express')
 const app = express()
 const yelp = require('yelp-fusion');
+const config = require('../config.js');
 const client = yelp.client(config.keys.YELP);
 
 app.get('/api', function(req, res) {

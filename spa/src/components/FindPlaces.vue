@@ -115,7 +115,7 @@ export default {
           });
           vm.markers[i].placeResult = list[i];
           google.maps.event.addListener(vm.markers[i], 'click', function() {
-            console.log(this)
+            console.log(list[i])
             vm.infoWindow.el.open(vm.map, this);
             vm.infoWindow.content = list[i]
           });
@@ -162,11 +162,6 @@ export default {
   components: {Accordion}
 };
 </script>
-<style lang="scss" scoped>
- .iw {
-   max-width: 15rem;
- }
-</style>
 
 
 

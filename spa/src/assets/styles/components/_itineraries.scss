@@ -1,0 +1,44 @@
+/*
+ * components/_itineraries.scss
+ */
+
+.c-itineraries {
+
+}
+
+.c-itineraries__add {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column;
+  border: 0;
+  width: 100%;
+  min-height: 7rem;
+  padding: .5rem;
+  background-color: #f7f7f7;
+  transition: .3s ease;
+  text-align: left;
+  cursor: pointer;
+  &:hover {
+    background-color: #D8D8D8;
+    .c-itineraries__add-icon {
+      fill: #fff;
+    }
+    .c-itineraries__add-title {
+      color: #fff;
+    }
+  }
+}
+
+.c-itineraries__add--active {
+  flex-flow: row;
+  display: block;
+  &:hover {
+    background-color: #f7f7f7;
+  }
+}
+
+.c-itineraries__add-icon {
+  fill: #D8D8D8;
+  transition: .3s ease;
+}

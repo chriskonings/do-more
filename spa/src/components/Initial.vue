@@ -1,16 +1,7 @@
 <template>
   <div class="o-root">
     <main class="o-main">
-      <div class="c-user">
-        <div class="c-user__icon">
-        </div>
-        <h2 class="c-user__name">
-          Chris Konings
-        </h2>
-        <a class="c-user__logout">
-          Logout
-        </a>
-      </div>
+      <User/>
       <div class="c-status c-status--empty">
         <span>You don’t have any plans today.</span>
         <small>Why tho?</small>
@@ -20,7 +11,8 @@
           <li class="c-menu__tab">
             <button
               @click="menu.places = true"
-              class="c-menu__tab-btn c-menu__tab-btn--is-active"
+              class="c-menu__tab-btn"
+              :class="{' c-menu__tab-btn--is-active': menu.places === true}"
             >
               Places
             </button>
@@ -29,6 +21,7 @@
             <button
               class="c-menu__tab-btn"
               @click="menu.places = false"
+              :class="{' c-menu__tab-btn--is-active': menu.places === false}"
             >
               Itineraries
             </button>
@@ -38,12 +31,12 @@
           <template v-if="menu.places">
             <form class="c-form c-form--menu">
               <LocationSearch
-              class="c-form-item"
+              class="c-form__item"
               :gMapsLoader="googleMapsLoader"
               :map="globalMap"
               />
               <ActivitySelect
-              class="c-form-item"
+              class="c-form__item"
               :options="options"
               @getActivities="getActivities"
               />
@@ -57,6 +50,7 @@
             </form>
           </template>
           <template v-else>
+            <Itineraries/>
             <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
           </template>
         </div>
@@ -83,15 +77,13 @@
 import gm from 'google-maps';
 import activityList from './activityList.json';
 import ActivitySelect from './ActivitySelect';
-// import { db } from '../main';
 import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import Itinerary from './Itinerary';
+import Itineraries from './Itineraries';
 import InfoWindow from './InfoWindow';
-
-gm.KEY = 'AIzaSyCS0KrhCnNOyW__KqWeeN-ZCC0ZuQNd3m4';
-gm.LIBRARIES = ['places', 'geometry'];
+import User from './User';
 
 export default {
   name: 'Initial',
@@ -113,11 +105,6 @@ export default {
       globalItinerary: [],
     };
   },
-  // firestore() {
-  //   return {
-  //     dbActivities: db.collection('activities'),
-  //   };
-  // },
   created() {
     this.googleMapsLoader.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
@@ -152,6 +139,15 @@ export default {
       });
     },
   },
-  components: { ActivitySelect, LocationSearch, FindPlaces, Map, Itinerary, InfoWindow },
+  components: {
+    ActivitySelect,
+    LocationSearch,
+    FindPlaces,
+    Map,
+    Itinerary,
+    Itineraries,
+    InfoWindow,
+    User,
+  },
 };
 </script>

@@ -22,6 +22,7 @@ export default {
         autocomplete.addListener('place_changed', (place) => {
           var place = autocomplete.getPlace();
           var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
+          console.log(place)
           this.map.panTo(panPoint)
         });
       })
