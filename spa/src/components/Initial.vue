@@ -1,7 +1,7 @@
 <template>
   <div class="o-root">
     <main class="o-main">
-      <User/>
+      <User :user="user"/>
       <div class="c-status c-status--empty">
         <span>You don’t have any plans today.</span>
         <small>Why tho?</small>
@@ -50,7 +50,7 @@
             </form>
           </template>
           <template v-else>
-            <Itineraries/>
+            <Itineraries v-if="user != null" :user="user"/>
             <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
           </template>
         </div>
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import firebase from 'firebase';
 import gm from 'google-maps';
 import activityList from './activityList.json';
 import ActivitySelect from './ActivitySelect';
@@ -89,6 +90,7 @@ export default {
   name: 'Initial',
   data() {
     return {
+      user: null,
       menu: {
         places: true,
       },
@@ -106,6 +108,14 @@ export default {
     };
   },
   created() {
+    const vm = this;
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        vm.user = user;
+      } else {
+        vm.user = null;
+      }
+    });
     this.googleMapsLoader.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
         content: this.$refs.info.$el,

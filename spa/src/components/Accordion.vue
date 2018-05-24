@@ -1,10 +1,17 @@
 <template>
   <div class="c-accordion">
-    <button @click="isOpen = !isOpen" class="c-accordion__btn" :class="{'is-active': isOpen}">
+    <button
+      @click.prevent="isOpen = !isOpen"
+      class="c-accordion__btn" :class="{'is-active': isOpen}"
+    >
       {{label}}
     </button>
     <transition name="slide">
-    <div v-show="isOpen" class="c-accordion__drawer" :class="{'is-active': isOpen}">
+    <div
+      v-show="isOpen"
+      class="c-accordion__drawer"
+      :class="{'is-active': isOpen}"
+    >
       <slot></slot>
     </div>
     </transition>

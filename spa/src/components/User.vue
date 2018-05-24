@@ -34,21 +34,11 @@ import firebase from 'firebase/app';
 /* eslint-disable */
 export default {
   name: 'User',
+  props: ['user'],
   data() {
     return {
       message: '',
-      user: null
     }
-  },
-  created() {
-    const vm = this
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        vm.user = user
-      } else {
-        vm.user = null
-      }
-    });
   },
   methods: {
     signIn() {

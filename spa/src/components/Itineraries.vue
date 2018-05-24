@@ -1,7 +1,7 @@
 <template>
   <div class="c-itineraries">
     <button
-      @click="adding = true"
+      @click.prevent="adding = true"
       v-if="!adding"
       class="c-itineraries__add"
       :class="{'c-itineraries__add--active': adding}"
@@ -15,33 +15,42 @@
         <input v-model="itinerary.name" class="c-text-input" placeholder="My trip"/>
       </div>
       <div class="c-form__item">
-        <button class="c-btn" type="submit">Add</button>
+        <button @click.prevent="addItinerary" class="c-btn" type="submit">Add</button>
       </div>
     </form>
+    <ul>
+      <li v-for="(itn, i) of itineraries" :key="i">
+        {{itn.name}}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
-/* eslint-disable */
+import { db } from '../firebase';
+
 export default {
   name: 'Itineraries',
-  props: [],
+  props: ['user'],
   data() {
     return {
+      itineraries: [],
       adding: false,
       itinerary: {
-        name: null
-      }
-    }
+        name: null,
+        user: this.user.uid,
+      },
+    };
+  },
+  firebase() {
+    return {
+      itineraries: db.ref('itineraries').orderByChild('user').equalTo(this.user.uid),
+    };
   },
   methods: {
     addItinerary() {
-      this.adding = true;
-    }
+      this.$firebaseRefs.itineraries.push(this.itinerary);
+    },
   },
 };
 </script>
-
-
-
-
