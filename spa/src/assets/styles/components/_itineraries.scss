@@ -3,10 +3,14 @@
  */
 
 .c-itineraries {
-
+  text-align: center;
 }
 
 .c-itineraries__add {
+  border-top: .3rem solid #f7f7f7;
+}
+
+.c-itineraries__add-btn {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,16 +25,16 @@
   cursor: pointer;
   &:hover {
     background-color: #D8D8D8;
-    .c-itineraries__add-icon {
+    .c-itineraries__add-btn-icon {
       fill: #fff;
     }
-    .c-itineraries__add-title {
+    .c-itineraries__add-btn-title {
       color: #fff;
     }
   }
 }
 
-.c-itineraries__add--active {
+.c-itineraries__add-btn--active {
   flex-flow: row;
   display: block;
   &:hover {
@@ -38,7 +42,27 @@
   }
 }
 
-.c-itineraries__add-icon {
+.c-itineraries__add-btn-icon {
   fill: #D8D8D8;
   transition: .3s ease;
+}
+
+.c-itineraries__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.c-itineraries__card {
+  border: 0;
+  width: 100%;
+  min-height: 7rem;
+  padding: .5rem;
+  background-color: #fff;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.c-itineraries__card-title {
+  margin: 0;
 }
