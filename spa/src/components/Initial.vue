@@ -68,6 +68,7 @@
     <InfoWindow
       ref="info"
       :place="infoWindow.content"
+      :itineraries="itineraries"
       :addToItinerary="updatePlaces"
     />
   </div>
@@ -85,6 +86,7 @@ import Itinerary from './Itinerary';
 import Itineraries from './Itineraries';
 import InfoWindow from './InfoWindow';
 import User from './User';
+import { db } from '../firebase';
 
 export default {
   name: 'Initial',
@@ -105,6 +107,7 @@ export default {
       globalMarkers: [],
       globalPlaces: [],
       globalItinerary: [],
+      itineraries: [],
     };
   },
   created() {
@@ -133,9 +136,18 @@ export default {
     updateMarkers(newMarkers) {
       this.globalMarkers = newMarkers;
     },
-    updatePlaces(newPlace) {
-      this.globalPlace = newPlace;
-      this.globalItinerary.push(this.globalPlace);
+    updatePlaces(id, newPlace) {
+      const place = {
+        user: this.user.uid,
+        itinerary: id,
+        place: {
+          name: newPlace.name,
+          id: newPlace.place.id
+        }
+      }
+      db.ref('places').push(place);
+      // this.globalPlace = newPlace;
+      // this.globalItinerary.push(this.globalPlace);
     },
     updateItinerary(id) {
       const vm = this;
@@ -148,6 +160,13 @@ export default {
         });
       });
     },
+  },
+  watch: {
+    user() {
+      if (this.user !== null) {
+        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid))
+      }
+    }
   },
   components: {
     ActivitySelect,

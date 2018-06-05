@@ -10,7 +10,10 @@
           </a>
         </li>
         <li class="c-info-window__link">
-          <button class="c-btn c-btn--link" @click.prevent="addToItinerary(place)">
+          <select v-if="itineraries.length >= 1" v-model="itinerary">
+            <option v-for="i of itineraries" :value="i['.key']">{{i.name}}</option>
+          </select>
+          <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, place)">
             Add to itinerary
           </button>
         </li>
@@ -22,8 +25,13 @@
 <script>
 /* eslint-disable */
 export default {
-  name: 'Itinerary',
-  props: ['place', 'addToItinerary'],
+  name: 'InfoWindow',
+  props: ['place', 'addToItinerary', 'itineraries'],
+  data() {
+    return {
+      itinerary: null
+    }
+  },
 };
 </script>
 <style lang="scss" scoped>

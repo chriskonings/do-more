@@ -5,7 +5,13 @@
       <ul class="c-itineraries__list">
         <li class="c-itineraries__card" v-for="(itn, i) of itineraries" :key="i">
           <h3 class="c-itineraries__card-title">{{itn.name}}</h3>
+          <button class="c-btn c-btn--link" @click="getPlaces(itn)">Get places</button>
           <button class="c-btn c-btn--link" @click="rmItinerary(itn)">Delete</button>
+        </li>
+      </ul>
+      <ul>
+        <li class="c-itineraries__card" v-for="(place, i) of places" :key="i">
+          <h3 class="c-itineraries__card-title">{{place.place.name}}</h3>
         </li>
       </ul>
       <div class="c-itineraries__add">
@@ -47,6 +53,7 @@ export default {
         name: null,
         user: this.user.uid,
       },
+      places: [],
     };
   },
   firebase() {
@@ -61,6 +68,13 @@ export default {
     };
   },
   methods: {
+    getPlaces(id) {
+      console.log(id)
+      // get places for this particular itinerary NOT for every itinerary
+
+      // const key = itinerary['.key']
+      this.$bindAsArray('places', db.ref('places').orderByChild('user').equalTo(this.user.uid))
+    },
     addItinerary() {
       this.adding = false
       this.$firebaseRefs.itineraries.push(this.itinerary);
