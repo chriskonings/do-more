@@ -1,9 +1,8 @@
 <template>
   <div class="c-itinerary">
-    <b>Itinerary</b>
     <ul>
       <li v-for="(p, i) in places" :key="i">
-        <h4>{{p.name}}</h4>
+        <h4>{{p.place.name}}</h4>
       </li>
     </ul>
   </div>
@@ -16,7 +15,7 @@ export default {
   props: ['places'],
   mounted() {
 
-},
+  },
   methods: {
 
   },

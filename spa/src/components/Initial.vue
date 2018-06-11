@@ -50,8 +50,8 @@
             </form>
           </template>
           <template v-else>
-            <Itineraries v-if="user != null" :user="user"/>
-            <Itinerary v-if="globalItinerary.length >= 1" :places="globalItinerary"/>
+            <Itineraries :user="user" @getPlaces="getPlaces"/>
+            <Itinerary :places="places"/>
           </template>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default {
       options: activityList.activities,
       globalMarkers: [],
       globalPlaces: [],
-      globalItinerary: [],
+      places: [],
       itineraries: [],
     };
   },
@@ -149,16 +149,8 @@ export default {
       // this.globalPlace = newPlace;
       // this.globalItinerary.push(this.globalPlace);
     },
-    updateItinerary(id) {
-      const vm = this;
-      this.googleMapsLoader.load((google) => {
-        const service = new google.maps.places.PlacesService(vm.globalMap);
-        service.getDetails({
-          placeId: id,
-        }, (place) => {
-          vm.globalItinerary.push(place);
-        });
-      });
+    getPlaces(list) {
+      this.places = list;
     },
   },
   watch: {

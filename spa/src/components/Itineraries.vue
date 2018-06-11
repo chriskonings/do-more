@@ -5,13 +5,8 @@
       <ul class="c-itineraries__list">
         <li class="c-itineraries__card" v-for="(itn, i) of itineraries" :key="i">
           <h3 class="c-itineraries__card-title">{{itn.name}}</h3>
-          <button class="c-btn c-btn--link" @click="getPlaces(itn)">Get places</button>
+          <button class="c-btn c-btn--link" @click="itineraryPlaces(itn)">Get places</button>
           <button class="c-btn c-btn--link" @click="rmItinerary(itn)">Delete</button>
-        </li>
-      </ul>
-      <ul>
-        <li class="c-itineraries__card" v-for="(place, i) of places" :key="i">
-          <h3 class="c-itineraries__card-title">{{place.place.name}}</h3>
         </li>
       </ul>
       <div class="c-itineraries__add">
@@ -68,9 +63,10 @@ export default {
     };
   },
   methods: {
-    getPlaces(i) {
+    itineraryPlaces(i) {
       const id = i['.key'];
       this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id));
+      this.$emit('getPlaces', this.places);
     },
     addItinerary() {
       this.adding = false;
