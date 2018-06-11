@@ -61,32 +61,32 @@ export default {
       itineraries: {
         source: db.ref('itineraries').orderByChild('user').equalTo(this.user.uid),
         // optionally provide the cancelCallback
-        cancelCallback: function () {},
+        cancelCallback() {},
         // this is called once the data has been retrieved from firebase
-        readyCallback: function () {this.loading = false}
-      }
+        readyCallback() { this.loading = false; },
+      },
     };
   },
   methods: {
     getPlaces(i) {
-      const id = i['.key']
-      this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id))
+      const id = i['.key'];
+      this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id));
     },
     addItinerary() {
-      this.adding = false
+      this.adding = false;
       this.$firebaseRefs.itineraries.push(this.itinerary);
     },
     rmItinerary(itinerary) {
-      const key = itinerary['.key']
-      const ref = this.$firebaseRefs.itineraries.child(key)
+      const key = itinerary['.key'];
+      const ref = this.$firebaseRefs.itineraries.child(key);
       ref.remove()
-      .then(function() {
-        console.log("Remove succeeded.")
-      })
-      .catch(function(error) {
-        console.log("Remove failed: " + error.message)
-      });
-    }
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+    },
   },
 };
 </script>

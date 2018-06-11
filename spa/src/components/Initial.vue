@@ -142,9 +142,9 @@ export default {
         itinerary: id,
         place: {
           name: newPlace.name,
-          id: newPlace.place.id
-        }
-      }
+          id: newPlace.place.id,
+        },
+      };
       db.ref('places').push(place);
       // this.globalPlace = newPlace;
       // this.globalItinerary.push(this.globalPlace);
@@ -164,9 +164,9 @@ export default {
   watch: {
     user() {
       if (this.user !== null) {
-        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid))
+        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
       }
-    }
+    },
   },
   components: {
     ActivitySelect,

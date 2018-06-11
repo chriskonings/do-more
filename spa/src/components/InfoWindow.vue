@@ -11,7 +11,9 @@
         </li>
         <li class="c-info-window__link">
           <select v-if="itineraries.length >= 1" v-model="itinerary">
-            <option v-for="i of itineraries" :value="i['.key']">{{i.name}}</option>
+            <option v-for="(itn, idx) of itineraries" :value="itn['.key']" :key="idx">
+              {{itn.name}}
+            </option>
           </select>
           <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, place)">
             Add to itinerary
