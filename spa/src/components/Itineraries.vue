@@ -68,12 +68,9 @@ export default {
     };
   },
   methods: {
-    getPlaces(id) {
-      console.log(id)
-      // get places for this particular itinerary NOT for every itinerary
-
-      // const key = itinerary['.key']
-      this.$bindAsArray('places', db.ref('places').orderByChild('user').equalTo(this.user.uid))
+    getPlaces(i) {
+      const id = i['.key']
+      this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id))
     },
     addItinerary() {
       this.adding = false
