@@ -63,9 +63,9 @@ export default {
     };
   },
   methods: {
-    itineraryPlaces(i) {
+    async itineraryPlaces(i) {
       const id = i['.key'];
-      this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id));
+      await this.$bindAsArray('places', db.ref('places').orderByChild('itinerary').equalTo(id));
       this.$emit('getPlaces', this.places);
     },
     addItinerary() {

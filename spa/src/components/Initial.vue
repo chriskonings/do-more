@@ -50,8 +50,8 @@
             </form>
           </template>
           <template v-else>
-            <Itineraries :user="user" @getPlaces="getPlaces"/>
-            <Itinerary :places="places"/>
+            <Itineraries v-show="!showPlaces" :user="user" @getPlaces="getPlaces"/>
+            <Itinerary v-show="showPlaces" :user="user" :places="places" @getItineraries="getItineraries"/>
           </template>
         </div>
       </div>
@@ -108,6 +108,7 @@ export default {
       globalPlaces: [],
       places: [],
       itineraries: [],
+      showPlaces: false
     };
   },
   created() {
@@ -137,12 +138,20 @@ export default {
       this.globalMarkers = newMarkers;
     },
     updatePlaces(id, newPlace) {
+      console.log(newPlace.place.geometry.location)
       const place = {
         user: this.user.uid,
         itinerary: id,
         place: {
-          name: newPlace.name,
           id: newPlace.place.id,
+          name: newPlace.name,
+          pos: {
+            lat: newPlace.place.geometry.location.lat(),
+            lng: newPlace.place.geometry.location.lng(),
+          },
+          image_url: typeof newPlace.place.photos !== 'undefined'
+          ? newPlace.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+          : ''
         },
       };
       db.ref('places').push(place);
@@ -151,7 +160,11 @@ export default {
     },
     getPlaces(list) {
       this.places = list;
+      this.showPlaces = true
     },
+    getItineraries () {
+      this.showPlaces = false
+    }
   },
   watch: {
     user() {
