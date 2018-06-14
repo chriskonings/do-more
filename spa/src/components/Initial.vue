@@ -166,13 +166,6 @@ export default {
       this.showPlaces = false
     }
   },
-  watch: {
-    user() {
-      if (this.user !== null) {
-        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
-      }
-    },
-  },
   components: {
     ActivitySelect,
     LocationSearch,

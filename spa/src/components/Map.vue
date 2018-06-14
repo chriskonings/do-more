@@ -43,30 +43,28 @@ export default {
         google.maps.event.addListener(vm.map, 'click', function(event) {
           if (event.placeId) {
             event.stop();
-            // this.calculateAndDisplayRoute(event.placeId);
-            // this.getPlaceInformation(event.placeId);
-          }
-          service.getDetails({placeId: event.placeId}, function(place, status) {
-            var marker = new google.maps.Marker({
-              position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
-              map: vm.map,
-              title: place.name,
-              visible: false,
-            });
-            console.log(vm.infoWindow)
-            vm.infoWindow.el.open(vm.map, marker);
-            if (status === 'OK') {
-              vm.infoWindow.content = {
-                name: place.name,
-                phone: place.formatted_phone_number,
-                place: place,
-                url: place.url,
-                image_url: typeof place.photos !== 'undefined'
-                    ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-                    : ''
+            service.getDetails({placeId: event.placeId}, function(place, status) {
+              var marker = new google.maps.Marker({
+                position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
+                map: vm.map,
+                title: place.name,
+                visible: false,
+              });
+              console.log(vm.infoWindow)
+              vm.infoWindow.el.open(vm.map, marker);
+              if (status === 'OK') {
+                vm.infoWindow.content = {
+                  name: place.name,
+                  phone: place.formatted_phone_number,
+                  place: place,
+                  url: place.url,
+                  image_url: typeof place.photos !== 'undefined'
+                      ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+                      : ''
+                }
               }
-            }
-          });
+            });
+          }
         });
         this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
       })

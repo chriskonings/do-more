@@ -41,26 +41,29 @@ export default {
   props: ['user'],
   data() {
     return {
-      loading: true,
       itineraries: [],
+      loading: true,
       adding: false,
       itinerary: {
         name: null,
-        user: this.user.uid,
+        user: this.user && this.user.uid,
       },
       places: [],
     };
   },
-  firebase() {
-    return {
-      itineraries: {
-        source: db.ref('itineraries').orderByChild('user').equalTo(this.user.uid),
-        // optionally provide the cancelCallback
-        cancelCallback() {},
-        // this is called once the data has been retrieved from firebase
-        readyCallback() { this.loading = false; },
-      },
-    };
+  created() {
+    if (this.user !== null) {
+      this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
+      this.loading = false;
+    }
+  },
+  watch: {
+    user() {
+      if (this.user !== null) {
+        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
+        this.loading = false;
+      }
+    }
   },
   methods: {
     async itineraryPlaces(i) {

@@ -21,12 +21,14 @@ import { db } from '../firebase';
 export default {
   name: 'Itinerary',
   props: ['places', 'user'],
-  firebase() {
+  data() {
     return {
-      dbPlaces: {
-        source: db.ref('places').orderByChild('user').equalTo(this.user.uid),
-      },
+      dbPlaces: null,
     };
+  },
+  async created() {
+    const uid = this.user && this.user.uid
+    await this.$bindAsArray('dbPlaces', db.ref('places').orderByChild('user').equalTo(uid));
   },
   methods: {
     getPlace(p) {
