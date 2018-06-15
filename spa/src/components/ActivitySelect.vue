@@ -1,7 +1,7 @@
 <!-- Vue component -->
 <template>
   <div>
-    <label class="c-label">What do you want to do?</label>
+    <label class="c-label">Got anything in mind?</label>
     <multiselect v-model="value"
       :options="options"
       :multiple="true"

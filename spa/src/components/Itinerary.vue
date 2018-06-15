@@ -20,24 +20,44 @@ import { db } from '../firebase';
 /* eslint-disable */
 export default {
   name: 'Itinerary',
-  props: ['places', 'user'],
+  props: ['places', 'user', 'gMapsLoader'],
   data() {
     return {
       dbPlaces: null,
     };
   },
-  async created() {
-    const uid = this.user && this.user.uid
-    await this.$bindAsArray('dbPlaces', db.ref('places').orderByChild('user').equalTo(uid));
+  async mounted() {
+    this.placeMarkers()
   },
   methods: {
+    placeMarkers() {
+      const list = this.places
+      console.log(list)
+      // this.gMapsLoader.load((google) => {
+      //   for (let i = 0; i < list.length; i++) {
+      //     vm.markers[i] = new google.maps.Marker({
+      //       position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
+      //       icon: utils.pinSymbol('red')
+      //     });
+      //     vm.markers[i].placeResult = list[i];
+      //     google.maps.event.addListener(vm.markers[i], 'click', function() {
+      //       console.log(list[i])
+      //       vm.infoWindow.el.open(vm.map, this);
+      //       vm.infoWindow.content = list[i]
+      //     });
+      //     vm.markers[i].setMap(vm.map);
+      //   }
+      // })
+      // if (this.markers.length >= 1) {
+      //   this.panMap(google);
+      // }
+    },
     getPlace(p) {
       console.log(p)
     },
     rmPlace (p) {
       const key = p['.key'];
-      console.log(key)
-      const ref = this.$firebaseRefs.dbPlaces.child(key);
+      const ref =  db.ref().child('places').child(key);
       ref.remove()
         .then(() => {
           console.log('Remove succeeded.');

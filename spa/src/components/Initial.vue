@@ -2,6 +2,7 @@
   <div class="o-root">
     <main class="o-main">
       <User :user="user"/>
+      <!--- user preferences here -->
       <div class="c-status c-status--empty">
         <span>You don’t have any plans today.</span>
         <small>Why tho?</small>
@@ -14,16 +15,17 @@
               class="c-menu__tab-btn"
               :class="{' c-menu__tab-btn--is-active': menu.places === true}"
             >
-              Places
+              Discover
             </button>
           </li>
           <li class="c-menu__tab">
             <button
+              :disabled="!user"
               class="c-menu__tab-btn"
               @click="menu.places = false"
               :class="{' c-menu__tab-btn--is-active': menu.places === false}"
             >
-              Itineraries
+              Gems
             </button>
           </li>
         </ul>
@@ -50,8 +52,17 @@
             </form>
           </template>
           <template v-else>
-            <Itineraries v-show="!showPlaces" :user="user" @getPlaces="getPlaces"/>
-            <Itinerary v-show="showPlaces" :user="user" :places="places" @getItineraries="getItineraries"/>
+            <Itineraries
+              v-show="!showPlaces"
+              :itineraries="itineraries"
+              :user="user"
+              @getPlaces="getPlaces"/>
+            <Itinerary
+              v-if="showPlaces"
+              :user="user"
+              :places="places"
+              :gMapsLoader="googleMapsLoader"
+              @getItineraries="getItineraries"/>
           </template>
         </div>
       </div>
@@ -116,6 +127,7 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         vm.user = user;
+        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
       } else {
         vm.user = null;
       }
@@ -128,17 +140,15 @@ export default {
   },
   methods: {
     getActivities(activities) {
-      const map = activities.map(activity => activity.name);
-      this.selectedActiv = map;
+      this.selectedActiv = activities.map(activity => activity.name);
     },
-    updateMap(newMap) {
-      this.globalMap = newMap;
+    updateMap(map) {
+      this.globalMap = map;
     },
-    updateMarkers(newMarkers) {
-      this.globalMarkers = newMarkers;
+    updateMarkers(m) {
+      this.globalMarkers = m;
     },
     updatePlaces(id, newPlace) {
-      console.log(newPlace.place.geometry.location)
       const place = {
         user: this.user.uid,
         itinerary: id,
@@ -164,7 +174,7 @@ export default {
     },
     getItineraries () {
       this.showPlaces = false
-    }
+    },
   },
   components: {
     ActivitySelect,

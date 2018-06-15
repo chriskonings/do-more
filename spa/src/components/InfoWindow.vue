@@ -9,9 +9,13 @@
             Link
           </a>
         </li>
-        <li class="c-info-window__link">
-          <select v-if="itineraries.length >= 1" v-model="itinerary">
-            <option v-for="(itn, idx) of itineraries" :value="itn['.key']" :key="idx">
+        <li v-if="itineraries.length" class="c-info-window__link">
+          <select v-model="itinerary">
+            <option
+              v-for="(itn, idx) of itineraries"
+              :value="itn['.key']"
+              :key="idx"
+            >
               {{itn.name}}
             </option>
           </select>
@@ -34,6 +38,13 @@ export default {
       itinerary: null
     }
   },
+  watch: {
+    itineraries() {
+      if (this.itineraries.length) {
+        this.itinerary = this.itineraries[0]['.key']
+      }
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

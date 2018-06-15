@@ -27,6 +27,12 @@
   width: 100%;
   cursor: pointer;
   transition: .3s ease;
+  &:disabled {
+    cursor: not-allowed;
+    &:hover {
+      background-color: #efefef;
+    }
+  }
   &:hover {
     background-color: #d2d2d2;
   }

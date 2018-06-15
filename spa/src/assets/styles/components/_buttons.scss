@@ -30,3 +30,16 @@
     background-color: transparent;
   }
 }
+
+.c-btn--naked {
+  border: 0;
+  background-color: transparent;
+  color: #2e2e2e;
+  padding: 0;
+  &:hover {
+    text-decoration: none;
+    border: 0;
+    background-color: transparent;
+    color: lighten(#2e2e2e, 40%);
+  }
+}

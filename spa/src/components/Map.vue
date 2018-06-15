@@ -50,7 +50,6 @@ export default {
                 title: place.name,
                 visible: false,
               });
-              console.log(vm.infoWindow)
               vm.infoWindow.el.open(vm.map, marker);
               if (status === 'OK') {
                 vm.infoWindow.content = {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="c-label">Where?</label>
+    <label class="c-label">Find a gem</label>
     <input class="c-text-input" ref="loc" placeholder="Search Location"/>
   </div>
 </template>
