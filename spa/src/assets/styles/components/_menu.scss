@@ -15,7 +15,6 @@
   margin: 0;
 }
 
-
 .c-menu__tab {
   flex: 1;
 }
@@ -43,6 +42,7 @@
 }
 
 .c-menu__cont {
+  overflow: auto;
   padding: 1rem;
   flex: 1;
   background-color: #fff;

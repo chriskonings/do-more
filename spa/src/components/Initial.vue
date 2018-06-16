@@ -3,10 +3,6 @@
     <main class="o-main">
       <User :user="user"/>
       <!--- user preferences here -->
-      <div class="c-status c-status--empty">
-        <span>You don’t have any plans today.</span>
-        <small>Why tho?</small>
-      </div>
       <div class="c-menu">
         <ul class="c-menu__tabs">
           <li class="c-menu__tab">
@@ -25,7 +21,7 @@
               @click="menu.places = false"
               :class="{' c-menu__tab-btn--is-active': menu.places === false}"
             >
-              Gems
+              My gems
             </button>
           </li>
         </ul>
@@ -44,25 +40,22 @@
               />
               <FindPlaces
               @emitMarkers="updateMarkers"
+              @emitPlaces="findPlaces"
               :selected="selectedActiv"
               :map="globalMap"
               :gMapsLoader="googleMapsLoader"
               :infoWindow="infoWindow"
               />
             </form>
+            <div v-for="p in places">
+              {{p.name}}
+              <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, p)">
+                Save
+              </button>
+            </div>
           </template>
           <template v-else>
-            <Itineraries
-              v-show="!showPlaces"
-              :itineraries="itineraries"
-              :user="user"
-              @getPlaces="getPlaces"/>
-            <Itinerary
-              v-if="showPlaces"
-              :user="user"
-              :places="places"
-              :gMapsLoader="googleMapsLoader"
-              @getItineraries="getItineraries"/>
+            <MyGems :user="user"/>
           </template>
         </div>
       </div>
@@ -80,7 +73,7 @@
       ref="info"
       :place="infoWindow.content"
       :itineraries="itineraries"
-      :addToItinerary="updatePlaces"
+      :addToItinerary="addToItinerary"
     />
   </div>
 </template>
@@ -93,6 +86,7 @@ import ActivitySelect from './ActivitySelect';
 import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
+import MyGems from './MyGems';
 import Itinerary from './Itinerary';
 import Itineraries from './Itineraries';
 import InfoWindow from './InfoWindow';
@@ -103,6 +97,7 @@ export default {
   name: 'Initial',
   data() {
     return {
+      itinerary: null,
       user: null,
       menu: {
         places: true,
@@ -119,6 +114,7 @@ export default {
       globalPlaces: [],
       places: [],
       itineraries: [],
+      itineraryList: [],
       showPlaces: false
     };
   },
@@ -127,7 +123,6 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         vm.user = user;
-        this.$bindAsArray('itineraries', db.ref('itineraries').orderByChild('user').equalTo(this.user.uid));
       } else {
         vm.user = null;
       }
@@ -139,6 +134,9 @@ export default {
     });
   },
   methods: {
+    findPlaces(p) {
+      this.places = p
+    },
     getActivities(activities) {
       this.selectedActiv = activities.map(activity => activity.name);
     },
@@ -148,41 +146,62 @@ export default {
     updateMarkers(m) {
       this.globalMarkers = m;
     },
-    updatePlaces(id, newPlace) {
-      const place = {
-        user: this.user.uid,
-        itinerary: id,
-        place: {
-          id: newPlace.place.id,
-          name: newPlace.name,
-          pos: {
-            lat: newPlace.place.geometry.location.lat(),
-            lng: newPlace.place.geometry.location.lng(),
+    addToItinerary(id, newPlace) {
+      let place = {}
+      if (newPlace.place) {
+        place = {
+          user: this.user.uid,
+          place: {
+            id: newPlace.place.id,
+            name: newPlace.place.name,
+            pos: {
+              lat: newPlace.place.geometry.location.lat(),
+              lng: newPlace.place.geometry.location.lng(),
+            },
+            image_url: typeof newPlace.place.photos !== 'undefined'
+            ? newPlace.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+            : '',
+            link: newPlace.url
+          }
+        };
+      } else {
+        place = {
+          user: this.user.uid,
+          place: {
+            id: newPlace.id,
+            name: newPlace.name,
+            pos: {
+              lat: newPlace.coordinates.latitude,
+              lng: newPlace.coordinates.longitude,
+            },
+            image_url: newPlace.image_url,
+            link: newPlace.url
           },
-          image_url: typeof newPlace.place.photos !== 'undefined'
-          ? newPlace.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-          : ''
-        },
-      };
-      db.ref('places').push(place);
-      // this.globalPlace = newPlace;
-      // this.globalItinerary.push(this.globalPlace);
+        };
+      }
+      db.ref('gems').push(place);
     },
     getPlaces(list) {
-      this.places = list;
+      this.itineraryList = list;
       this.showPlaces = true
     },
     getItineraries () {
       this.showPlaces = false
     },
   },
+  watch: {
+    itineraries() {
+      if (this.itineraries.length) {
+        this.itinerary = this.itineraries[0]['.key']
+      }
+    }
+  },
   components: {
     ActivitySelect,
     LocationSearch,
     FindPlaces,
     Map,
-    Itinerary,
-    Itineraries,
+    MyGems,
     InfoWindow,
     User,
   },

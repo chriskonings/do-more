@@ -46,9 +46,9 @@ export default {
       markers: [],
       searching: false,
       places: null,
-      limit: 2,
+      limit: 25,
       radius: 0,
-      sortBy: 'distance'
+      sortBy: 'best_match'
     };
   },
 
@@ -67,6 +67,7 @@ export default {
       this.searching = true
       await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
+      this.$emit('emitPlaces', fullResults)
       await this.placeYelpMarkers(fullResults)
       this.searching = false
     },
@@ -79,11 +80,12 @@ export default {
           const places = await this.getYelpPlaces(this.selected[i], this.limit, radius, this.sortBy);
           list.push(...places);
         }
-        return list;
       } else {
         this.searching = false
-        console.log('nothing selected');
+        const places = await this.getYelpPlaces(null, this.limit, radius, this.sortBy);
+        list.push(...places);
       }
+      return list;
     },
     async getYelpPlaces (term, limit, radius, sortBy) {
       const mapLat = await this.map.center.lat();
@@ -106,6 +108,7 @@ export default {
       }
     },
     async placeYelpMarkers(list) {
+      console.log(list)
       const vm = this
       this.gMapsLoader.load((google) => {
         for (let i = 0; i < list.length; i++) {
@@ -115,7 +118,6 @@ export default {
           });
           vm.markers[i].placeResult = list[i];
           google.maps.event.addListener(vm.markers[i], 'click', function() {
-            console.log(list[i])
             vm.infoWindow.el.open(vm.map, this);
             vm.infoWindow.content = list[i]
           });
@@ -123,7 +125,7 @@ export default {
         }
       })
       if (this.markers.length >= 1) {
-        this.panMap(google);
+        // this.panMap(google);
       }
     },
     panMap (google) {

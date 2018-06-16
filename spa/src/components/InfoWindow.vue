@@ -9,18 +9,9 @@
             Link
           </a>
         </li>
-        <li v-if="itineraries.length" class="c-info-window__link">
-          <select v-model="itinerary">
-            <option
-              v-for="(itn, idx) of itineraries"
-              :value="itn['.key']"
-              :key="idx"
-            >
-              {{itn.name}}
-            </option>
-          </select>
+        <li class="c-info-window__link">
           <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, place)">
-            Add to itinerary
+            Save
           </button>
         </li>
       </ul>

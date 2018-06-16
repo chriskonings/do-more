@@ -1,6 +1,7 @@
 <template>
   <div>
-    <label class="c-label">Find a gem</label>
+    <!-- <label class="c-label">Search</label> -->
+    <span v-show="invalidPlace">Click to search</span>
     <input class="c-text-input" ref="loc" placeholder="Search Location"/>
   </div>
 </template>
@@ -10,6 +11,11 @@
 export default {
   name: 'LocationSearch',
   props: ['gMapsLoader', 'map'],
+  data() {
+    return {
+      invalidPlace: false
+    }
+  },
   mounted() {
     this.initLocationSearch();
   },
@@ -18,12 +24,15 @@ export default {
       this.gMapsLoader.load((google) => {
         const input = this.$refs.loc;
         var autocomplete = new google.maps.places.Autocomplete(input);
-        // autocomplete.setTypes(['regions'])
-        autocomplete.addListener('place_changed', (place) => {
+        autocomplete.addListener('place_changed', () => {
           var place = autocomplete.getPlace();
-          var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
-          console.log(place)
-          this.map.panTo(panPoint)
+          if (place.geometry) {
+            this.invalidPlace = false
+            var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
+            this.map.panTo(panPoint)
+          } else {
+            this.invalidPlace = true
+          }
         });
       })
     }
