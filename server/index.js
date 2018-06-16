@@ -9,19 +9,34 @@ const client = yelp.client(config.keys.YELP);
 app.get('/api', function(req, res) {
   const {lat, lng, limit, term, radius, sortBy} = req.query
   const calcRadius = radius < 40000 ? radius : null
-  const search = client.search({
-    sort_by: sortBy,
-    limit: limit,
-    latitude: lat,
-    longitude: lng,
-    term: term,
-    radius: calcRadius
-  }).then(response => {
-    res.json(response.jsonBody.businesses)
-  }).catch(e => {
-    res.json(e.body.businesses)
-    console.log(e);
-  });
+  if (term) {
+    const search = client.search({
+      sort_by: sortBy,
+      limit: limit,
+      latitude: lat,
+      longitude: lng,
+      term: term,
+      radius: calcRadius
+    }).then(response => {
+      res.json(response.jsonBody.businesses)
+    }).catch(e => {
+      res.json(e.body.businesses)
+      console.log(e);
+    });
+  } else {
+    const search = client.search({
+      sort_by: sortBy,
+      limit: limit,
+      latitude: lat,
+      longitude: lng,
+      radius: calcRadius
+    }).then(response => {
+      res.json(response.jsonBody.businesses)
+    }).catch(e => {
+      res.json(e.body.businesses)
+      console.log(e);
+    });
+  }
   return search
 })
 
