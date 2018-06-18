@@ -17,10 +17,16 @@
   display: flex;
   align-items: center;
 }
-.c-my-gem__name {
+.c-my-gem__details {
   flex: 1;
+}
+.c-my-gem__name {
   font-size: 1.5rem;
 }
+.c-my-gem__loc {
+  font-size: 1.2rem;
+}
+
 .c-my-gem__delete {
   display: block;
   text-align: center;

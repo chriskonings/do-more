@@ -16,7 +16,7 @@
       <button
         v-else
         :disabled="searching"
-        @click="searchSelected"
+        @click.prevent="searchSelected"
         class="c-btn"
       >
         Search
@@ -27,6 +27,7 @@
 
 <script>
 /* eslint-disable */
+import { db } from '../firebase';
 import utils from './utils'
 import axios from 'axios'
 import Accordion from './Accordion'
@@ -67,8 +68,9 @@ export default {
       this.searching = true
       await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
-      this.$emit('emitPlaces', fullResults)
       await this.placeYelpMarkers(fullResults)
+      const listWithUsers = this.getUsers(fullResults)
+      this.$emit('emitPlaces', listWithUsers)
       this.searching = false
     },
     async buildList () {
@@ -107,8 +109,23 @@ export default {
         console.log(e)
       }
     },
+    getUsers(places) {
+      const vm = this
+      places.forEach(p => {
+        var placeRef = db.ref('gems').orderByChild('place/id').equalTo(p.id);
+        placeRef.on('value', function(snapshot) {
+          if (snapshot.val()) {
+            for (var s in snapshot.val()) {
+              var item = snapshot.val()[s];
+              vm.$set(p, 'users', item.users);
+              console.log(p)
+            }
+          }
+        });
+      });
+      return places
+    },
     async placeYelpMarkers(list) {
-      console.log(list)
       const vm = this
       this.gMapsLoader.load((google) => {
         for (let i = 0; i < list.length; i++) {

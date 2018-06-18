@@ -47,12 +47,7 @@
               :infoWindow="infoWindow"
               />
             </form>
-            <div v-for="p in places">
-              {{p.name}}
-              <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, p)">
-                Save
-              </button>
-            </div>
+            <Places v-if="places.length" :places="places" :addToItinerary="addToItinerary"/>
           </template>
           <template v-else>
             <MyGems :user="user"/>
@@ -87,10 +82,9 @@ import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import MyGems from './MyGems';
-import Itinerary from './Itinerary';
-import Itineraries from './Itineraries';
 import InfoWindow from './InfoWindow';
 import User from './User';
+import Places from './Places'
 import { db } from '../firebase';
 
 export default {
@@ -134,8 +128,8 @@ export default {
     });
   },
   methods: {
-    findPlaces(p) {
-      this.places = p
+    async findPlaces(placesList) {
+      this.places = placesList
     },
     getActivities(activities) {
       this.selectedActiv = activities.map(activity => activity.name);
@@ -146,14 +140,33 @@ export default {
     updateMarkers(m) {
       this.globalMarkers = m;
     },
-    addToItinerary(id, newPlace) {
+    addToItinerary(newPlace) {
+      // if ID is found in gems DB then just update the users array
+
       let place = {}
       if (newPlace.place) {
+        let city = null
+        let country = null
+        for (var addr of newPlace.place.address_components) {
+          if (addr.types.includes('postal_town')) {
+            city = addr.short_name
+          } else if (addr.types.includes('country')) {
+            country = addr.short_name
+          }
+        }
         place = {
-          user: this.user.uid,
           place: {
+            users: {
+              [this.user.uid]: {
+                id: this.user.uid,
+                displayName: this.user.displayName,
+                photoURL: this.user.photoURL,
+              },
+            },
             id: newPlace.place.id,
             name: newPlace.place.name,
+            city: city,
+            country: country,
             pos: {
               lat: newPlace.place.geometry.location.lat(),
               lng: newPlace.place.geometry.location.lng(),
@@ -166,10 +179,18 @@ export default {
         };
       } else {
         place = {
-          user: this.user.uid,
+          users: {
+            [this.user.uid]: {
+              id: this.user.uid,
+              displayName: this.user.displayName,
+              photoURL: this.user.photoURL,
+            },
+          },
           place: {
             id: newPlace.id,
             name: newPlace.name,
+            city: newPlace.location.city,
+            country: newPlace.location.country,
             pos: {
               lat: newPlace.coordinates.latitude,
               lng: newPlace.coordinates.longitude,
@@ -202,6 +223,7 @@ export default {
     FindPlaces,
     Map,
     MyGems,
+    Places,
     InfoWindow,
     User,
   },

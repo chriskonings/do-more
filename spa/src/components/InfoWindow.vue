@@ -10,7 +10,7 @@
           </a>
         </li>
         <li class="c-info-window__link">
-          <button class="c-btn c-btn--link" @click.prevent="addToItinerary(itinerary, place)">
+          <button class="c-btn c-btn--link" @click.prevent="addToItinerary(place)">
             Save
           </button>
         </li>

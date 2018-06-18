@@ -9,8 +9,9 @@ const client = yelp.client(config.keys.YELP);
 app.get('/api', function(req, res) {
   const {lat, lng, limit, term, radius, sortBy} = req.query
   const calcRadius = radius < 40000 ? radius : null
+  let search
   if (term) {
-    const search = client.search({
+    search = client.search({
       sort_by: sortBy,
       limit: limit,
       latitude: lat,
@@ -24,7 +25,7 @@ app.get('/api', function(req, res) {
       console.log(e);
     });
   } else {
-    const search = client.search({
+    search = client.search({
       sort_by: sortBy,
       limit: limit,
       latitude: lat,
