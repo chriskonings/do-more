@@ -6,9 +6,23 @@
   display: flex;
   align-items: center;
   padding: 1rem;
+  min-height: 6rem;
+}
+
+.c-user__details {
+  flex: 1;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+}
+
+.c-user__details--signed-in {
+  flex-flow: row;
 }
 
 .c-user__icon {
+  margin-right: 1rem;
   border-radius: 50%;
   height: 4rem;
   width: 4rem;
@@ -16,5 +30,5 @@
 }
 
 .c-user__name {
-  margin: 0 1rem;
+  margin: 0;
 }

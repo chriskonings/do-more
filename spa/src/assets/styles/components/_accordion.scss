@@ -27,7 +27,6 @@
 .c-accordion__drawer {
   padding: 1rem 0;
   max-height: 999rem;
-  overflow: hidden;
   &.slide-enter-active, &.slide-leave-active {
     transition: .3s ease;
   }
@@ -35,5 +34,6 @@
     max-height: 0;
     padding: 0;
     opacity: 0;
+    overflow: hidden;
   }
 }

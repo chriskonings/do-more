@@ -1,6 +1,6 @@
 <template>
   <div class="c-itinerary">
-    <ul class="c-my-gems">
+    <ul class="c-my-gems__list">
       <li class="c-my-gem" v-for="(p, i) in places" :key="i">
         <div class="c-my-gem__cont">
           <div class="c-my-gem__img" :style="{ 'background-image': 'url(' + p.image_url + ')' }"></div>
@@ -13,7 +13,7 @@
               <a :href="p.url" target="_blank" class="c-btn c-btn--naked">Link</a>
             </li>
             <li class="c-my-gem__btn">
-              <button class="c-btn c-btn--naked" @click.prevent="addToItinerary(p)">
+              <button :disabled="!user" class="c-btn c-btn--naked" @click.prevent="addToItinerary(p)">
                 Claim
               </button>
             </li>
@@ -29,7 +29,7 @@
 /* eslint-disable */
 export default {
   name: 'Places',
-  props: ['places', 'addToItinerary'],
+  props: ['places', 'addToItinerary', 'user'],
   data() {
     return {
     };

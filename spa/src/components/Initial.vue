@@ -1,6 +1,7 @@
 <template>
   <div class="o-root">
-    <main class="o-main">
+    <div v-if="!globalMap" class="spinner"></div>
+    <main class="o-main" v-if="globalMap">
       <User :user="user"/>
       <!--- user preferences here -->
       <div class="c-menu">
@@ -29,25 +30,26 @@
           <template v-if="menu.places">
             <form class="c-form c-form--menu">
               <LocationSearch
-              class="c-form__item"
-              :gMapsLoader="googleMapsLoader"
-              :map="globalMap"
-              />
-              <ActivitySelect
-              class="c-form__item"
-              :options="options"
-              @getActivities="getActivities"
+                class="c-form__item"
+                :gMapsLoader="googleMapsLoader"
+                :map="globalMap"
               />
               <FindPlaces
-              @emitMarkers="updateMarkers"
-              @emitPlaces="findPlaces"
-              :selected="selectedActiv"
-              :map="globalMap"
-              :gMapsLoader="googleMapsLoader"
-              :infoWindow="infoWindow"
+                @emitMarkers="updateMarkers"
+                @emitPlaces="findPlaces"
+                @clearMarkers="clearMarkers"
+                :map="globalMap"
+                :radius="radius"
+                :gMapsLoader="googleMapsLoader"
+                :infoWindow="infoWindow"
               />
             </form>
-            <Places v-if="places.length" :places="places" :addToItinerary="addToItinerary"/>
+            <Places
+              v-if="places.length"
+              :places="places"
+              :addToItinerary="addToItinerary"
+              :user="user"
+            />
           </template>
           <template v-else>
             <MyGems :user="user"/>
@@ -55,7 +57,7 @@
         </div>
       </div>
     </main>
-    <aside class="o-aside">
+    <aside v-show="globalMap" class="o-aside">
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
@@ -63,21 +65,19 @@
         :gMapsLoader="googleMapsLoader"
         :infoWindow="infoWindow"
       />
+      <InfoWindow
+        ref="info"
+        :place="infoWindow.content"
+        :itineraries="itineraries"
+        :addToItinerary="addToItinerary"
+      />
     </aside>
-    <InfoWindow
-      ref="info"
-      :place="infoWindow.content"
-      :itineraries="itineraries"
-      :addToItinerary="addToItinerary"
-    />
   </div>
 </template>
 
 <script>
 import firebase from 'firebase';
 import gm from 'google-maps';
-import activityList from './activityList.json';
-import ActivitySelect from './ActivitySelect';
 import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
@@ -91,6 +91,7 @@ export default {
   name: 'Initial',
   data() {
     return {
+      loading: false,
       itinerary: null,
       user: null,
       menu: {
@@ -103,7 +104,6 @@ export default {
       googleMapsLoader: gm,
       globalMap: null,
       selectedActiv: [],
-      options: activityList.activities,
       globalMarkers: [],
       globalPlaces: [],
       places: [],
@@ -114,13 +114,7 @@ export default {
   },
   created() {
     const vm = this;
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        vm.user = user;
-      } else {
-        vm.user = null;
-      }
-    });
+    firebase.auth().onAuthStateChanged((user) =>  this.user = user);
     this.googleMapsLoader.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
         content: this.$refs.info.$el,
@@ -131,18 +125,25 @@ export default {
     async findPlaces(placesList) {
       this.places = placesList
     },
-    getActivities(activities) {
-      this.selectedActiv = activities.map(activity => activity.name);
-    },
     updateMap(map) {
       this.globalMap = map;
     },
     updateMarkers(m) {
       this.globalMarkers = m;
     },
+    async clearMarkers() {
+      // To do - only remove markers not found in list of places
+      const vm = this
+      return new Promise(function (success, reject){
+        for (let i = 0; i < vm.globalMarkers.length; i++) {
+          vm.globalMarkers[i].setMap(null);
+        }
+        vm.globalMarkers = [];
+        success()
+      });
+    },
     addToItinerary(newPlace) {
-      // if ID is found in gems DB then just update the users array
-
+      // To do - if ID is found in gems DB then just update the users array
       let place = {}
       if (newPlace.place) {
         let city = null
@@ -209,6 +210,27 @@ export default {
     getItineraries () {
       this.showPlaces = false
     },
+    panMap (google) {
+      const bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < this.globalMarkers.length; i++) {
+        bounds.extend(this.globalMarkers[i].getPosition());
+      }
+      this.globalMap.fitBounds(bounds);
+    },
+  },
+  computed: {
+    radius() {
+      let radius;
+      gm.load((google) => {
+        const bounds = this.globalMap.getBounds();
+        const center = this.globalMap.getCenter();
+        if (bounds && center) {
+          const ne = bounds.getNorthEast();
+          radius = google.maps.geometry.spherical.computeDistanceBetween(center, ne);
+        }
+      })
+      return Math.floor(radius);
+    }
   },
   watch: {
     itineraries() {
@@ -218,7 +240,6 @@ export default {
     }
   },
   components: {
-    ActivitySelect,
     LocationSearch,
     FindPlaces,
     Map,

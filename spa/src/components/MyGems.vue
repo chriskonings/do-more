@@ -1,6 +1,7 @@
 <template>
-  <div class="c-itinerary">
-    <ul class="c-my-gems">
+  <div class="c-my-gems">
+    <div v-if="loading" class="spinner"></div>
+    <ul v-else class="c-my-gems__list">
       <li class="c-my-gem" v-for="(g, i) in gems" :key="i">
         <div class="c-my-gem__cont">
           <div class="c-my-gem__img" :style="{ 'background-image': 'url(' + g.place.image_url + ')' }"></div>
@@ -38,15 +39,20 @@ export default {
   props: ['user'],
   data() {
     return {
+      loading: false,
       gems: [],
       deleting: null,
     };
   },
   async mounted() {
-    this.$bindAsArray('gems', db.ref('gems').orderByChild('users/' + this.user.uid));
+    await this.getGems()
   },
   methods: {
-    deleteGem (g) {
+    async getGems() {
+      this.loading = true;
+      this.$bindAsArray('gems', db.ref('gems').orderByChild('users/' + this.user.uid), null, () => this.loading = false)
+    },
+    deleteGem(g) {
       const key = g['.key'];
       const ref =  db.ref().child('gems').child(key);
       ref.remove()

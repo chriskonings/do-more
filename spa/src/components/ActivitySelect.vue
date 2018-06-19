@@ -1,7 +1,7 @@
 <!-- Vue component -->
 <template>
   <div>
-    <label class="c-label">Got anything in mind?</label>
+    <label class="c-label">Activities</label>
     <multiselect v-model="value"
       :options="options"
       :multiple="true"
@@ -39,19 +39,22 @@
 
 <script>
 import Multiselect from 'vue-multiselect';
+import activityList from './activityList.json';
 
 export default {
   name: 'ActivitySelect',
-  props: ['options', 'getActivities'],
+  props: ['getActivities'],
   components: { Multiselect },
   data() {
     return {
       value: null,
+      options: activityList.activities,
     };
   },
   watch: {
     value(newData) {
-      this.$emit('getActivities', newData);
+      const a = newData.map(s => s.name)
+      this.$emit('getActivities', a);
     },
   },
 };

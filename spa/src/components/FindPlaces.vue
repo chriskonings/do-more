@@ -1,22 +1,25 @@
 <template>
   <div>
     <Accordion label="Filter">
-      <label>Order by:</label>
-      <select v-model="sortBy">
-        <option value="distance">Distance</option>
-        <option value="best_match">Best Match</option>
-        <option value="rating">Rating</option>
-        <option value="review_count">Review Count</option>
-      </select>
-      <label>At a time:</label>
-      <input id="number" type="number" v-model="limit">
+      <ActivitySelect
+        @getActivities="getActivities"
+      />
+      <div>
+        <label>Order by:</label>
+        <select v-model="sortBy">
+          <option value="distance">Distance</option>
+          <option value="best_match">Best Match</option>
+          <option value="rating">Rating</option>
+          <option value="review_count">Review Count</option>
+        </select>
+      </div>
     </Accordion>
     <div class="u-txt-center">
       <div v-if="searching" class="spinner"></div>
       <button
         v-else
         :disabled="searching"
-        @click.prevent="searchSelected"
+        @click.prevent="getPlaces"
         class="c-btn"
       >
         Search
@@ -30,6 +33,7 @@
 import { db } from '../firebase';
 import utils from './utils'
 import axios from 'axios'
+import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
 
 function sortThenLimit (arr, limit) {
@@ -41,55 +45,42 @@ function sortThenLimit (arr, limit) {
 
 export default {
   name: 'FindPlaces',
-  props: ['gMapsLoader', 'map', 'selected', 'infoWindow', 'iw'],
+  props: ['gMapsLoader', 'infoWindow', 'iw', 'radius', 'map'],
   data() {
     return {
       markers: [],
+      selected: [],
       searching: false,
       places: null,
       limit: 25,
-      radius: 0,
       sortBy: 'best_match'
     };
   },
 
   methods: {
-    async clearMarkers(markers) {
-      const vm = this
-      return new Promise(function (success, reject){
-        for (let i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
-        }
-        vm.markers = [];
-        success()
-      });
-    },
-    async searchSelected() {
+    async getPlaces() {
       this.searching = true
-      await this.clearMarkers(this.markers);
       const fullResults = await this.buildList()
       await this.placeYelpMarkers(fullResults)
-      const listWithUsers = this.getUsers(fullResults)
-      this.$emit('emitPlaces', listWithUsers)
+      const listWithUsers = await this.getUsers(fullResults)
+      await this.$emit('emitPlaces', listWithUsers)
       this.searching = false
     },
     async buildList () {
       const lastStatus = null;
       const list = [];
-      const radius = await this.getMapRadius()
       if (this.selected.length > 0) {
         for (let i = 0; i < this.selected.length; i++) {
-          const places = await this.getYelpPlaces(this.selected[i], this.limit, radius, this.sortBy);
+          const places = await this.getYelpPlaces(this.selected[i], this.radius, this.sortBy);
           list.push(...places);
         }
       } else {
-        this.searching = false
-        const places = await this.getYelpPlaces(null, this.limit, radius, this.sortBy);
+        const places = await this.getYelpPlaces(null, this.radius, this.sortBy);
         list.push(...places);
       }
       return list;
     },
-    async getYelpPlaces (term, limit, radius, sortBy) {
+    async getYelpPlaces (term, radius, sortBy) {
       const mapLat = await this.map.center.lat();
       const mapLng = await this.map.center.lng();
       try {
@@ -97,7 +88,7 @@ export default {
           params: {
             lat: mapLat,
             lng: mapLng,
-            limit: limit,
+            limit: 25,
             term: term,
             radius: radius,
             sortBy: sortBy
@@ -118,7 +109,6 @@ export default {
             for (var s in snapshot.val()) {
               var item = snapshot.val()[s];
               vm.$set(p, 'users', item.users);
-              console.log(p)
             }
           }
         });
@@ -126,6 +116,8 @@ export default {
       return places
     },
     async placeYelpMarkers(list) {
+      this.markers = []
+      this.$emit('clearMarkers')
       const vm = this
       this.gMapsLoader.load((google) => {
         for (let i = 0; i < list.length; i++) {
@@ -141,44 +133,22 @@ export default {
           vm.markers[i].setMap(vm.map);
         }
       })
-      if (this.markers.length >= 1) {
-        // this.panMap(google);
-      }
     },
-    panMap (google) {
-      const bounds = new google.maps.LatLngBounds();
-      for (var i = 0; i < this.markers.length; i++) {
-        bounds.extend(this.markers[i].getPosition());
-      }
-      this.map.fitBounds(bounds);
-    },
-    async getMapRadius () {
-      let radius;
-      this.gMapsLoader.load((google) => {
-        const bounds = this.map.getBounds();
-        const center = this.map.getCenter();
-        if (bounds && center) {
-          const ne = bounds.getNorthEast();
-          radius = google.maps.geometry.spherical.computeDistanceBetween(center, ne);
-        }
-      })
-      return Math.floor(radius);
-    },
-    updateSearchMap () {
-      this.gMapsLoader.load((google) => {
-        this.places = new google.maps.places.PlacesService(this.map);
-      })
+    getActivities(activities) {
+      this.selected = activities;
     },
   },
   watch: {
+    limit(l) {
+      if (l > 50) {
+        this.limit = 50
+      }
+    },
     markers(){
       this.$emit('emitMarkers', this.markers)
-    },
-    map() {
-      this.updateSearchMap()
     }
   },
-  components: {Accordion}
+  components: {Accordion, ActivitySelect}
 };
 </script>
 

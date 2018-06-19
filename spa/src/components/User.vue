@@ -1,11 +1,13 @@
 <template>
   <div class="c-user">
     <template v-if="user">
-      <div class="c-user__icon" :style="{ 'background-image': 'url(' + user.photoURL + ')' }">
+      <div class="c-user__details c-user__details--signed-in">
+        <div class="c-user__icon" :style="{ 'background-image': 'url(' + user.photoURL + ')' }">
+        </div>
+        <h2 class="c-user__name">
+          {{user.displayName}}
+        </h2>
       </div>
-      <h2 class="c-user__name">
-        {{user.displayName}}
-      </h2>
       <button @click.prevent="signOut" class="c-btn c-btn--naked">
         Sign out
       </button>
@@ -18,9 +20,12 @@
       </ul> -->
     </template>
     <template v-else>
-      <h2 class="c-user__name">
-        You're not signed in.
-      </h2>
+      <div class="c-user__details">
+        <h2 class="c-user__name">
+          Guest
+        </h2>
+        <span>Sign in to claim places</span>
+      </div>
       <button @click.prevent="signIn" class="c-btn c-btn--naked">
         Sign in
       </button>
