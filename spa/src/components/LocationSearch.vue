@@ -10,7 +10,7 @@
 /* eslint-disable */
 export default {
   name: 'LocationSearch',
-  props: ['gMapsLoader', 'map'],
+  props: ['map'],
   data() {
     return {
       invalidPlace: false
@@ -21,21 +21,19 @@ export default {
   },
   methods: {
     initLocationSearch() {
-      this.gMapsLoader.load((google) => {
-        const input = this.$refs.loc;
-        var autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.addListener('place_changed', () => {
-          var place = autocomplete.getPlace();
-          if (place.geometry) {
-            this.invalidPlace = false
-            var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
-            this.map.panTo(panPoint)
-          } else {
-            this.invalidPlace = true
-          }
-        });
-      })
-    }
+      const input = this.$refs.loc;
+      var autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.addListener('place_changed', () => {
+        var place = autocomplete.getPlace();
+        if (place.geometry) {
+          this.invalidPlace = false
+          var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
+          this.map.panTo(panPoint)
+        } else {
+          this.invalidPlace = true
+        }
+      });
+  }
   },
 };
 </script>

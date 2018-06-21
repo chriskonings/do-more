@@ -1,5 +1,5 @@
 <template>
-  <div class="c-itinerary">
+  <div class="c-my-gems">
     <ul class="c-my-gems__list">
       <li class="c-my-gem" v-for="(p, i) in places" :key="i">
         <div class="c-my-gem__cont">
@@ -21,6 +21,13 @@
         </div>
       </li>
     </ul>
+    <button
+      v-if="page >= 1"
+      @click.prevent="loadMore"
+      class="c-btn"
+    >
+      Load More
+    </button>
   </div>
 </template>
 
@@ -29,13 +36,15 @@
 /* eslint-disable */
 export default {
   name: 'Places',
-  props: ['places', 'addToItinerary', 'user'],
+  props: ['places', 'addToItinerary', 'user', 'page'],
   data() {
     return {
     };
   },
   methods: {
-
+    loadMore() {
+      this.$emit('getPlaces')
+    }
   },
   watch: {
 

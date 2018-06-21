@@ -27,70 +27,57 @@
           </li>
         </ul>
         <div class="c-menu__cont">
-          <template v-if="menu.places">
-            <form class="c-form c-form--menu">
-              <LocationSearch
-                class="c-form__item"
-                :gMapsLoader="googleMapsLoader"
-                :map="globalMap"
-              />
-              <FindPlaces
-                @emitMarkers="updateMarkers"
-                @emitPlaces="findPlaces"
-                @clearMarkers="clearMarkers"
-                :map="globalMap"
-                :radius="radius"
-                :gMapsLoader="googleMapsLoader"
-                :infoWindow="infoWindow"
-              />
-            </form>
-            <Places
-              v-if="places.length"
-              :places="places"
-              :addToItinerary="addToItinerary"
-              :user="user"
-            />
-          </template>
-          <template v-else>
-            <MyGems :user="user"/>
-          </template>
+          <LocationSearch
+            class="c-form__item"
+            v-show="menu.places"
+            :map="globalMap"
+          />
+          <FindPlaces
+            v-show="menu.places"
+            @emitMarkers="updateMarkers"
+            @clearMarkers="clearMarkers"
+            :user='user'
+            :map="globalMap"
+            :radius="radius"
+            :infoWindow="infoWindow"
+            :addToItinerary="addToItinerary"
+          />
+          <MyGems v-show="!menu.places" v-if="user" :user="user"/>
         </div>
       </div>
     </main>
-    <aside v-show="globalMap" class="o-aside">
+    <aside v-if="googleMaps" class="o-aside">
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
-        :selected="selectedActiv"
-        :gMapsLoader="googleMapsLoader"
         :infoWindow="infoWindow"
       />
-      <InfoWindow
-        ref="info"
-        :place="infoWindow.content"
-        :itineraries="itineraries"
-        :addToItinerary="addToItinerary"
-      />
     </aside>
+    <InfoWindow
+      ref="info"
+      :place="infoWindow.content"
+      :itineraries="itineraries"
+      :addToItinerary="addToItinerary"
+    />
   </div>
 </template>
 
 <script>
 import firebase from 'firebase';
-import gm from 'google-maps';
 import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import MyGems from './MyGems';
 import InfoWindow from './InfoWindow';
 import User from './User';
-import Places from './Places'
 import { db } from '../firebase';
 
 export default {
   name: 'Initial',
+  props: ['google'],
   data() {
     return {
+      googleMaps: null,
       loading: false,
       itinerary: null,
       user: null,
@@ -101,30 +88,25 @@ export default {
         el: null,
         content: null,
       },
-      googleMapsLoader: gm,
       globalMap: null,
       selectedActiv: [],
       globalMarkers: [],
-      globalPlaces: [],
-      places: [],
       itineraries: [],
       itineraryList: [],
       showPlaces: false
     };
   },
-  created() {
+  async created() {
     const vm = this;
     firebase.auth().onAuthStateChanged((user) =>  this.user = user);
-    this.googleMapsLoader.load((google) => {
+    this.google.load((gm) => {
+      this.googleMaps = gm.maps
       this.infoWindow.el = new google.maps.InfoWindow({
         content: this.$refs.info.$el,
       });
     });
   },
   methods: {
-    async findPlaces(placesList) {
-      this.places = placesList
-    },
     updateMap(map) {
       this.globalMap = map;
     },
@@ -221,14 +203,12 @@ export default {
   computed: {
     radius() {
       let radius;
-      gm.load((google) => {
-        const bounds = this.globalMap.getBounds();
-        const center = this.globalMap.getCenter();
-        if (bounds && center) {
-          const ne = bounds.getNorthEast();
-          radius = google.maps.geometry.spherical.computeDistanceBetween(center, ne);
-        }
-      })
+      const bounds = this.globalMap.getBounds();
+      const center = this.globalMap.getCenter();
+      if (bounds && center) {
+        const ne = bounds.getNorthEast();
+        radius = this.googleMaps.geometry.spherical.computeDistanceBetween(center, ne);
+      }
       return Math.floor(radius);
     }
   },
@@ -244,7 +224,6 @@ export default {
     FindPlaces,
     Map,
     MyGems,
-    Places,
     InfoWindow,
     User,
   },

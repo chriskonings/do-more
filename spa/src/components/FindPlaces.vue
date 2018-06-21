@@ -25,6 +25,14 @@
         Search
       </button>
     </div>
+    <Places
+      v-if="places"
+      :places="places"
+      :addToItinerary="addToItinerary"
+      :user="user"
+      :page="page"
+      @getPlaces="nextPage"
+    />
   </div>
 </template>
 
@@ -35,6 +43,7 @@ import utils from './utils'
 import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
+import Places from './Places'
 
 function sortThenLimit (arr, limit) {
   const sort = arr.sort(function (a, b) {
@@ -45,9 +54,17 @@ function sortThenLimit (arr, limit) {
 
 export default {
   name: 'FindPlaces',
-  props: ['gMapsLoader', 'infoWindow', 'iw', 'radius', 'map'],
+  props: [
+    'infoWindow',
+    'radius',
+    'map',
+    'addToItinerary',
+    'user',
+  ],
   data() {
     return {
+      page: 0,
+      places: [],
       markers: [],
       selected: [],
       searching: false,
@@ -63,8 +80,12 @@ export default {
       const fullResults = await this.buildList()
       await this.placeYelpMarkers(fullResults)
       const listWithUsers = await this.getUsers(fullResults)
-      await this.$emit('emitPlaces', listWithUsers)
+      this.page === 0 ? this.places = listWithUsers : this.places.push(...listWithUsers)
+      if (fullResults.length >= 25) this.page += 1
       this.searching = false
+    },
+    nextPage() {
+      this.getPlaces()
     },
     async buildList () {
       const lastStatus = null;
@@ -84,11 +105,13 @@ export default {
       const mapLat = await this.map.center.lat();
       const mapLng = await this.map.center.lng();
       try {
+        console.log(this.page * 25)
         const response = await axios.get(`/api`, {
           params: {
             lat: mapLat,
             lng: mapLng,
             limit: 25,
+            offset: this.page * 25,
             term: term,
             radius: radius,
             sortBy: sortBy
@@ -119,26 +142,27 @@ export default {
       this.markers = []
       this.$emit('clearMarkers')
       const vm = this
-      this.gMapsLoader.load((google) => {
-        for (let i = 0; i < list.length; i++) {
-          vm.markers[i] = new google.maps.Marker({
-            position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
-            icon: utils.pinSymbol('red')
-          });
-          vm.markers[i].placeResult = list[i];
-          google.maps.event.addListener(vm.markers[i], 'click', function() {
-            vm.infoWindow.el.open(vm.map, this);
-            vm.infoWindow.content = list[i]
-          });
-          vm.markers[i].setMap(vm.map);
-        }
-      })
+      for (let i = 0; i < list.length; i++) {
+        vm.markers[i] = new google.maps.Marker({
+          position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
+          icon: utils.pinSymbol('#D65745')
+        });
+        vm.markers[i].placeResult = list[i];
+        google.maps.event.addListener(vm.markers[i], 'click', function() {
+          vm.infoWindow.el.open(vm.map, this);
+          vm.infoWindow.content = list[i]
+        });
+        vm.markers[i].setMap(vm.map);
+      }
     },
     getActivities(activities) {
       this.selected = activities;
     },
   },
   watch: {
+    selected(){
+      this.page = 0
+    },
     limit(l) {
       if (l > 50) {
         this.limit = 50
@@ -148,7 +172,7 @@ export default {
       this.$emit('emitMarkers', this.markers)
     }
   },
-  components: {Accordion, ActivitySelect}
+  components: {Accordion, ActivitySelect, Places}
 };
 </script>
 

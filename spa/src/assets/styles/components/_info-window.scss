@@ -2,17 +2,21 @@
  * components/_info-window.scss
  */
 
-
 .c-info-window {
-  max-width: 10rem;
+  max-width: 150px;
+  text-align: center;
 }
 
 .c-info-window__img {
-  max-width: 5rem !important;
-  max-width: 5rem;
+  display: inline-block;
+  border-radius: 50%;
+  height: 6rem;
+  width: 6rem;
+  margin: 1rem;
 }
 
 .c-info-window__title {
+  font-size: 1.2rem;
   display: block;
   margin-bottom: .5rem;
 }
@@ -28,6 +32,7 @@
 }
 
 .c-info-window__link {
+  display: inline-block;
   margin: .5rem 0;
 }
 

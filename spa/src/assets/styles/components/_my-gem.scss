@@ -4,9 +4,8 @@
 
 .c-my-gems {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 10rem;
+  flex-flow: column;
 }
 
 .c-my-gems__list {

@@ -17,7 +17,7 @@ import utils from './utils'
 
 export default {
   name: 'Map',
-  props: ['gMapsLoader', 'selected', 'emitMap', 'markers', 'infoWindow'],
+  props: ['emitMap', 'markers', 'infoWindow'],
   data() {
     return {
       position: { lat: 0, lng: 0 },
@@ -33,40 +33,38 @@ export default {
   methods: {
     initMap() {
       const vm = this
-      this.gMapsLoader.load((google) => {
-        vm.map = new google.maps.Map(this.$refs.map, {
-          zoom: 17,
-          center: this.position,
-          mapTypeControl: false,
-        })
-        const service = new google.maps.places.PlacesService(vm.map);
-        google.maps.event.addListener(vm.map, 'click', function(event) {
-          if (event.placeId) {
-            event.stop();
-            service.getDetails({placeId: event.placeId}, function(place, status) {
-              var marker = new google.maps.Marker({
-                position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
-                map: vm.map,
-                title: place.name,
-                visible: false,
-              });
-              vm.infoWindow.el.open(vm.map, marker);
-              if (status === 'OK') {
-                vm.infoWindow.content = {
-                  name: place.name,
-                  phone: place.formatted_phone_number,
-                  place: place,
-                  url: place.url,
-                  image_url: typeof place.photos !== 'undefined'
-                      ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-                      : ''
-                }
-              }
-            });
-          }
-        });
-        this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
+      vm.map = new google.maps.Map(this.$refs.map, {
+        zoom: 17,
+        center: this.position,
+        mapTypeControl: false,
       })
+      const service = new google.maps.places.PlacesService(vm.map);
+      google.maps.event.addListener(vm.map, 'click', function(event) {
+        if (event.placeId) {
+          event.stop();
+          service.getDetails({placeId: event.placeId}, function(place, status) {
+            var marker = new google.maps.Marker({
+              position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
+              map: vm.map,
+              title: place.name,
+              visible: false,
+            });
+            vm.infoWindow.el.open(vm.map, marker);
+            if (status === 'OK') {
+              vm.infoWindow.content = {
+                name: place.name,
+                phone: place.formatted_phone_number,
+                place: place,
+                url: place.url,
+                image_url: typeof place.photos !== 'undefined'
+                    ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+                    : ''
+              }
+            }
+          });
+        }
+      });
+      this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
     },
     getLocation () {
       if (navigator.geolocation) {
