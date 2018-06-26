@@ -98,9 +98,9 @@ export default {
   },
   async created() {
     const vm = this;
-    firebase.auth().onAuthStateChanged((user) =>  this.user = user);
-    this.google.load((gm) => {
-      this.googleMaps = gm.maps
+    firebase.auth().onAuthStateChanged((user) => this.user = user);
+    this.google.load((google) => {
+      this.googleMaps = google.maps
       this.infoWindow.el = new google.maps.InfoWindow({
         content: this.$refs.info.$el,
       });
@@ -132,9 +132,9 @@ export default {
         let country = null
         for (var addr of newPlace.place.address_components) {
           if (addr.types.includes('postal_town')) {
-            city = addr.short_name
+            city = addr.short_name;
           } else if (addr.types.includes('country')) {
-            country = addr.short_name
+            country = addr.short_name;
           }
         }
         place = {
@@ -157,7 +157,7 @@ export default {
             image_url: typeof newPlace.place.photos !== 'undefined'
             ? newPlace.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
             : '',
-            link: newPlace.url
+            link: newPlace.url,
           }
         };
       } else {
@@ -179,7 +179,7 @@ export default {
               lng: newPlace.coordinates.longitude,
             },
             image_url: newPlace.image_url,
-            link: newPlace.url
+            link: newPlace.url,
           },
         };
       }
@@ -187,10 +187,10 @@ export default {
     },
     getPlaces(list) {
       this.itineraryList = list;
-      this.showPlaces = true
+      this.showPlaces = true;
     },
     getItineraries () {
-      this.showPlaces = false
+      this.showPlaces = false;
     },
     panMap (google) {
       const bounds = new google.maps.LatLngBounds();
@@ -215,7 +215,7 @@ export default {
   watch: {
     itineraries() {
       if (this.itineraries.length) {
-        this.itinerary = this.itineraries[0]['.key']
+        this.itinerary = this.itineraries[0]['.key'];
       }
     }
   },

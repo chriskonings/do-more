@@ -1,7 +1,11 @@
 <template>
   <div class="c-info-window">
     <template v-if="place">
-      <div class="c-info-window__img" :style="{ backgroundImage: 'url(' + place.image_url + ')' }"alt="place-photo"></div>
+      <div
+        class="c-info-window__img"
+        :style="{ backgroundImage: 'url(' + place.image_url + ')' }"
+        alt="place-photo">
+      </div>
       <b class="c-info-window__title">{{place.name}}</b>
       <ul class="c-info-window__links">
         <li class="c-info-window__link">

@@ -53,7 +53,7 @@ export default {
   },
   watch: {
     value(newData) {
-      const a = newData.map(s => s.name)
+      const a = newData.map(s => s.name);
       this.$emit('getActivities', a);
     },
   },

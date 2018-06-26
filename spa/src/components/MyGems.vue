@@ -4,17 +4,29 @@
     <ul v-else class="c-my-gems__list">
       <li class="c-my-gem" v-for="(g, i) in gems" :key="i">
         <div class="c-my-gem__cont">
-          <div class="c-my-gem__img" :style="{ 'background-image': 'url(' + g.place.image_url + ')' }"></div>
+          <div
+            class="c-my-gem__img"
+            :style="{ 'background-image': 'url(' + g.place.image_url + ')' }">
+          </div>
           <div class="c-my-gem__details">
             <div class="c-my-gem__name">{{g.place.name}}</div>
             <div class="c-my-gem__loc">{{g.place.city}}, {{g.place.country}}</div>
           </div>
           <ul class="c-my-gem__btns">
             <li class="c-my-gem__btn">
-              <a :href="g.place.link" target="_blank" class="c-btn c-btn--naked">Link</a>
+              <a
+                :href="g.place.link"
+                target="_blank"
+                class="c-btn c-btn--naked">
+                Link
+              </a>
             </li>
             <li class="c-my-gem__btn">
-              <button @click="deleting = i" class="c-btn c-btn--naked">Trash</button>
+              <button
+                @click="deleting = i"
+                class="c-btn c-btn--naked">
+                Trash
+              </button>
             </li>
           </ul>
         </div>
