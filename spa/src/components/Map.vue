@@ -77,10 +77,20 @@ export default {
           const crd = pos.coords;
           const panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
           this.map.panTo(panPoint)
+          this.pinYouAreHere(crd.latitude, crd.longitude)
         }, (err) => {
           console.warn(`ERROR(${err.code}): ${err.message}`);
         }, options);
       }
+    },
+    async pinYouAreHere(lat, lng) {
+      const currMarker = new google.maps.Marker({
+        position: {lat: lat, lng: lng},
+        icon: utils.pinSymbol('green'),
+        animation: google.maps.Animation.DROP,
+      });
+      this.markers.push(currMarker)
+      currMarker.setMap(this.map);
     },
     whereToGo () {
       const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()])

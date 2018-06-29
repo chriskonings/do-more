@@ -9,12 +9,21 @@
 }
 
 .multiselect__tags {
-  padding: .5rem !important;
   border-radius: 0 !important;
+  border: 1px solid #cccccc !important;
 }
 
 .multiselect, .multiselect__input, .multiselect__single {
   font-size: inherit !important;
+}
+
+.multiselect__option--selected {
+  &:hover {
+    &:after {
+      background-color: #bd5e5e !important;
+    }
+    background-color: #bd5e5e !important;
+  }
 }
 
 .multiselect__option--highlight {

@@ -5,8 +5,8 @@
         @getActivities="getActivities"
       />
       <div>
-        <label>Order by:</label>
-        <select v-model="sortBy">
+        <label class="c-label">Order</label>
+        <select v-model="sortBy" class="c-select">
           <option value="distance">Distance</option>
           <option value="best_match">Best Match</option>
           <option value="rating">Rating</option>
