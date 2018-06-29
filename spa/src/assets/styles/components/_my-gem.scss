@@ -6,6 +6,7 @@
   display: flex;
   min-height: 10rem;
   flex-flow: column;
+  margin: 1rem 0;
 }
 
 .c-my-gems__list {
@@ -19,6 +20,10 @@
   flex-flow: column;
   min-height: 5rem;
   padding: 1rem;
+  cursor: pointer;
+  &:hover {
+    background-color: #efefef;
+  }
 }
 .c-my-gem__cont {
   display: flex;

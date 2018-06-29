@@ -1,7 +1,7 @@
 <template>
   <div class="c-my-gems">
     <ul class="c-my-gems__list">
-      <li class="c-my-gem" v-for="(p, i) in places" :key="i">
+      <li class="c-my-gem" v-for="(p, i) in places" :key="i" @mouseover="highlight(p, p.id)">
         <div class="c-my-gem__cont">
           <div
             class="c-my-gem__img"
@@ -33,12 +33,13 @@
       </li>
     </ul>
     <button
-      v-if="page >= 1"
+      v-if="page >= 1 && !loading"
       @click.prevent="loadMore"
       class="c-btn"
     >
       Load More
     </button>
+    <div v-if="page >= 1 && loading" class="spinner"></div>
   </div>
 </template>
 
@@ -47,15 +48,32 @@
 /* eslint-disable */
 export default {
   name: 'Places',
-  props: ['places', 'addToItinerary', 'user', 'page'],
+  props: [
+    'places',
+    'addToItinerary',
+    'user',
+    'page',
+    'loading',
+    'markers',
+    'map',
+    'infoWindow',
+  ],
   data() {
     return {
     };
   },
   methods: {
+    highlight(p, id) {
+      this.markers.forEach(m => {
+        if (m.place.id === id) {
+          this.infoWindow.el.open(this.map, m);
+          this.infoWindow.content = p
+        }
+      });
+    },
     loadMore() {
-      this.$emit('getPlaces')
-    }
+      this.$emit('getPlaces');
+    },
   },
   watch: {
 

@@ -217,7 +217,7 @@ export default {
       if (this.itineraries.length) {
         this.itinerary = this.itineraries[0]['.key'];
       }
-    }
+    },
   },
   components: {
     LocationSearch,
