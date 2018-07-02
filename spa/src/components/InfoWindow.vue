@@ -2,9 +2,15 @@
   <div class="c-info-window">
     <template v-if="place">
       <div
-        class="c-info-window__img"
-        :style="{ backgroundImage: 'url(' + place.image_url + ')' }"
-        alt="place-photo">
+        class="c-info-window__img-container"
+        :class="{'is-loading': loading}"
+      >
+        <img
+          v-show="!loading"
+          class="c-info-window__img"
+          :src="place.image_url"
+          @load="loading = false"
+          alt="place-photo"/>
       </div>
       <b class="c-info-window__title">{{place.name}}</b>
       <ul class="c-info-window__links">
@@ -30,7 +36,8 @@ export default {
   props: ['place', 'addToItinerary', 'itineraries'],
   data() {
     return {
-      itinerary: null
+      itinerary: null,
+      loading: true,
     }
   },
   watch: {
@@ -38,6 +45,12 @@ export default {
       if (this.itineraries.length) {
         this.itinerary = this.itineraries[0]['.key']
       }
+    },
+    place() {
+      this.loading = true
+    },
+    loading() {
+      console.log(this.loading)
     }
   }
 };

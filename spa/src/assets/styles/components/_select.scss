@@ -8,7 +8,20 @@
   appearance: none;
   background-color: #fff;
   border: 1px solid #cccccc;
-  background-image: url();
+  background-image: url('~/static/arrow-down.svg');
+  background-size: 1rem;
+  background-repeat: no-repeat;
+  background-position: right center;
   border-radius: 0;
   padding: .5rem;
+}
+
+.c-hello {
+  height: 100px;
+  width: 100px;
+  border: 2px solid pink;
+  background-image: url('~/static/arrow-down.svg');
+  background-size:cover;
+  display: block;
+  background-position: center;
 }

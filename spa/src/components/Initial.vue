@@ -36,11 +36,11 @@
             v-show="menu.places"
             @emitMarkers="updateMarkers"
             @clearMarkers="clearMarkers"
-            :user='user'
+            :user="user"
             :map="globalMap"
             :radius="radius"
             :infoWindow="infoWindow"
-            :addToItinerary="addToItinerary"
+            :claimPlace="claimPlace"
           />
           <MyGems v-show="!menu.places" v-if="user" :user="user"/>
         </div>
@@ -56,8 +56,7 @@
     <InfoWindow
       ref="info"
       :place="infoWindow.content"
-      :itineraries="itineraries"
-      :addToItinerary="addToItinerary"
+      :claimPlace="claimPlace"
     />
   </div>
 </template>
@@ -91,8 +90,6 @@ export default {
       globalMap: null,
       selectedActiv: [],
       globalMarkers: [],
-      itineraries: [],
-      itineraryList: [],
       showPlaces: false
     };
   },
@@ -124,7 +121,7 @@ export default {
         success()
       });
     },
-    addToItinerary(newPlace) {
+    claimPlace(newPlace) {
       // To do - if ID is found in gems DB then just update the users array
       let place = {}
       if (newPlace.place) {
@@ -211,13 +208,6 @@ export default {
       }
       return Math.floor(radius);
     }
-  },
-  watch: {
-    itineraries() {
-      if (this.itineraries.length) {
-        this.itinerary = this.itineraries[0]['.key'];
-      }
-    },
   },
   components: {
     LocationSearch,

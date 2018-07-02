@@ -1,12 +1,24 @@
 <template>
   <div class="c-my-gems">
     <ul class="c-my-gems__list">
-      <li class="c-my-gem" v-for="(p, i) in places" :key="i" @mouseover="highlight(p, p.id)">
+      <li
+        class="c-my-gem"
+        v-for="(p, i) in places"
+        :key="i"
+        @mouseover="highlight(p, p.id, i)"
+      >
         <div class="c-my-gem__cont">
-          <div
+        <div
+          class="c-my-gem__img-container"
+          :class="{'is-loading': loadingImgs[p.id]}"
+        >
+          <img
+            v-show="!loadingImgs[p.id]"
             class="c-my-gem__img"
-            :style="{ 'background-image': 'url(' + p.image_url + ')' }">
-          </div>
+            :src="p.image_url"
+            @load="imageLoaded(p.id)"
+            alt="place-photo"/>
+        </div>
           <div class="c-my-gem__details">
             <div class="c-my-gem__name">{{p.name}}</div>
             Shared by:
@@ -60,23 +72,38 @@ export default {
   ],
   data() {
     return {
+      currentlyHighlighted: null,
+      loadingImgs: {},
     };
   },
   methods: {
-    highlight(p, id) {
-      this.markers.forEach(m => {
-        if (m.place.id === id) {
-          this.infoWindow.el.open(this.map, m);
-          this.infoWindow.content = p
-        }
-      });
+    highlight(p, id, idx) {
+      if (this.currentlyHighlighted !== idx) {
+        this.currentlyHighlighted = idx
+        this.markers.forEach(m => {
+          if (m.place.id === id) {
+            this.infoWindow.el.open(this.map, m);
+            this.infoWindow.content = p
+          }
+        });
+      }
     },
     loadMore() {
       this.$emit('getPlaces');
     },
+    imageLoaded(id) {
+      this.$set(this.loadingImgs, id, false)
+    },
   },
   watch: {
-
+    places(list) {
+      const keys = Object.keys(this.loadingImgs)
+      list.map((p) => {
+        if (!keys.includes(p.id)) {
+          this.$set(this.loadingImgs, p.id, true)
+        }
+      })
+    }
   },
 };
 </script>

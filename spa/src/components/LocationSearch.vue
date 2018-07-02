@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <label class="c-label">Search</label> -->
+    <label class="c-label">Location search</label>
     <span v-show="invalidPlace">Click to search</span>
     <input class="c-text-input" ref="loc" placeholder="Search Location"/>
   </div>
@@ -10,7 +10,7 @@
 /* eslint-disable */
 export default {
   name: 'LocationSearch',
-  props: ['map'],
+  props: ['map', 'places'],
   data() {
     return {
       invalidPlace: false
@@ -26,6 +26,9 @@ export default {
       autocomplete.addListener('place_changed', () => {
         var place = autocomplete.getPlace();
         if (place.geometry) {
+          if (place.types.includes('establishment')) {
+            console.log(place)
+          }
           this.invalidPlace = false
           var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
           this.map.panTo(panPoint)
