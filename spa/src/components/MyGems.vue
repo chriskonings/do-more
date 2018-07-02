@@ -5,8 +5,15 @@
       <li class="c-my-gem" v-for="(g, i) in gems" :key="i">
         <div class="c-my-gem__cont">
           <div
-            class="c-my-gem__img"
-            :style="{ 'background-image': 'url(' + g.place.image_url + ')' }">
+            class="c-my-gem__img-container"
+            :class="{'is-loading': loadingImgs[g.place.id]}"
+          >
+            <img
+              v-show="!loadingImgs[g.place.id]"
+              class="c-my-gem__img"
+              :src="g.place.image_url"
+              @load="imageLoaded(g.place.id)"
+              alt="place-photo"/>
           </div>
           <div class="c-my-gem__details">
             <div class="c-my-gem__name">{{g.place.name}}</div>
@@ -54,6 +61,7 @@ export default {
       loading: false,
       gems: [],
       deleting: null,
+      loadingImgs: {},
     };
   },
   async mounted() {
@@ -74,6 +82,19 @@ export default {
         .catch((error) => {
           console.log('Remove failed: ', error.message);
         });
+    },
+    imageLoaded(id) {
+      this.$set(this.loadingImgs, id, false)
+    },
+  },
+  watch: {
+    gems(list) {
+      const keys = Object.keys(this.loadingImgs)
+      list.map((g) => {
+        if (!keys.includes(g.place.id)) {
+          this.$set(this.loadingImgs, g.place.id, true)
+        }
+      })
     }
   },
 };
