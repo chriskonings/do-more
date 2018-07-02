@@ -28,7 +28,7 @@
     <Places
       v-if="places"
       :places="places"
-      :addToItinerary="addToItinerary"
+      :claimPlace="claimPlace"
       :user="user"
       :page="page"
       @getPlaces="getPlaces"
@@ -48,6 +48,8 @@ import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
 import Places from './Places'
+import greyGem from '../assets/grey-gem.svg'
+import blueGem from '../assets/blue-gem.svg'
 
 export default {
   name: 'FindPlaces',
@@ -55,7 +57,7 @@ export default {
     'infoWindow',
     'radius',
     'map',
-    'addToItinerary',
+    'claimPlace',
     'user',
   ],
   data() {
@@ -76,7 +78,6 @@ export default {
       if (this.page === 0) this.places = []
       await this.buildList()
       await this.placeYelpMarkers(this.places)
-      await this.getUsers()
       if (this.places.length >= 25) this.page += 1
       this.searching = false
     },
@@ -116,18 +117,17 @@ export default {
         console.log(e)
       }
     },
-    getUsers() {
+    getUsers(p, id) {
+      console.log(p)
       const vm = this
-      this.places.forEach(p => {
-        var placeRef = db.ref('gems').orderByChild('place/id').equalTo(p.id);
-        placeRef.on('value', function(snapshot) {
-          if (snapshot.val()) {
-            for (var s in snapshot.val()) {
-              var item = snapshot.val()[s];
-              vm.$set(p, 'users', item.users);
-            }
+      var placeRef = db.ref('gems').orderByChild('place/id').equalTo(id);
+      placeRef.on('value', function(snapshot) {
+        if (snapshot.val()) {
+          for (var s in snapshot.val()) {
+            var item = snapshot.val()[s];
+            vm.$set(p, 'users', item.users);
           }
-        });
+        }
       });
     },
     async placeYelpMarkers(list) {
@@ -135,9 +135,10 @@ export default {
       this.$emit('clearMarkers')
       const vm = this
       for (let i = 0; i < list.length; i++) {
+        await this.getUsers(list[i], list[i].id)
         vm.markers[i] = new google.maps.Marker({
           position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
-          icon: utils.pinSymbol('#D65745')
+          icon: list[i].users ? blueGem : greyGem
         });
         vm.markers[i].place = list[i];
         google.maps.event.addListener(vm.markers[i], 'click', function() {

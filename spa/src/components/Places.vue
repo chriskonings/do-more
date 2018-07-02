@@ -36,7 +36,7 @@
               <button
                 :disabled="!user"
                 class="c-btn c-btn--naked"
-                @click.prevent="addToItinerary(p)">
+                @click.prevent="claimPlace(p)">
                 Claim
               </button>
             </li>
@@ -62,7 +62,7 @@ export default {
   name: 'Places',
   props: [
     'places',
-    'addToItinerary',
+    'claimPlace',
     'user',
     'page',
     'loading',

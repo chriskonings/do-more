@@ -13,6 +13,12 @@
           alt="place-photo"/>
       </div>
       <b class="c-info-window__title">{{place.name}}</b>
+      <div class="c-info-window__shares">
+        Shared by:
+        <div v-if="place.users" v-for="(u, i) in place.users" :key="i">
+          {{u.displayName}}
+        </div>
+      </div>
       <ul class="c-info-window__links">
         <li class="c-info-window__link">
           <a class="c-btn c-btn--naked" :href="place.url" target="_blank">
@@ -20,7 +26,7 @@
           </a>
         </li>
         <li class="c-info-window__link">
-          <button class="c-btn c-btn--naked" @click.prevent="addToItinerary(place)">
+          <button class="c-btn c-btn--naked" @click.prevent="claimPlace(place)">
             Save
           </button>
         </li>
@@ -33,7 +39,7 @@
 /* eslint-disable */
 export default {
   name: 'InfoWindow',
-  props: ['place', 'addToItinerary', 'itineraries'],
+  props: ['place', 'claimPlace', 'itineraries'],
   data() {
     return {
       itinerary: null,
@@ -48,9 +54,6 @@ export default {
     },
     place() {
       this.loading = true
-    },
-    loading() {
-      console.log(this.loading)
     }
   }
 };
