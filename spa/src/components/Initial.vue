@@ -22,7 +22,7 @@
               @click="menu.places = false"
               :class="{' c-menu__tab-btn--is-active': menu.places === false}"
             >
-              My gems
+              Saved
             </button>
           </li>
         </ul>
@@ -54,7 +54,7 @@
       />
     </aside>
     <InfoWindow
-      ref="info"
+      ref="infoW"
       :place="infoWindow.content"
       :claimPlace="claimPlace"
     />
@@ -73,11 +73,9 @@ import { db } from '../firebase';
 
 export default {
   name: 'Initial',
-  props: ['google'],
+  props: ['googleMaps'],
   data() {
     return {
-      googleMaps: null,
-      loading: false,
       itinerary: null,
       user: null,
       menu: {
@@ -96,10 +94,9 @@ export default {
   async created() {
     const vm = this;
     firebase.auth().onAuthStateChanged((user) => this.user = user);
-    this.google.load((google) => {
-      this.googleMaps = google.maps
+    gm.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
-        content: this.$refs.info.$el,
+        content: this.$refs.infoW.$el,
       });
     });
   },

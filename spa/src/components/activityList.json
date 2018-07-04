@@ -1,15 +1,16 @@
 {
   "activities": [
     {"name": "park"},
-    {"name": "garden"},
+    {"name": "music"},
+    {"name": "cycling"},
     {"name": "pub"},
     {"name": "food"},
-    {"name": "shopping center"},
-    {"name": "cinema"},
-    {"name": "movie theatre"},
+    {"name": "shopping"},
+    {"name": "movies"},
     {"name": "bouldering"},
     {"name": "snowboarding"},
     {"name": "climbing"},
-    {"name": "monument"}
+    {"name": "skatehboardng"},
+    {"name": "surfing"}
   ]
 }

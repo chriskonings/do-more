@@ -48,8 +48,8 @@ import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
 import Places from './Places'
-import greyGem from '../assets/grey-gem.svg'
-import blueGem from '../assets/blue-gem.svg'
+import emptyHeart from '../assets/empty-heart.svg'
+import fullHeart from '../assets/full-heart.svg'
 
 export default {
   name: 'FindPlaces',
@@ -118,7 +118,6 @@ export default {
       }
     },
     getUsers(p, id) {
-      console.log(p)
       const vm = this
       var placeRef = db.ref('gems').orderByChild('place/id').equalTo(id);
       placeRef.on('value', function(snapshot) {
@@ -136,17 +135,24 @@ export default {
       const vm = this
       for (let i = 0; i < list.length; i++) {
         await this.getUsers(list[i], list[i].id)
-        vm.markers[i] = new google.maps.Marker({
-          position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
-          icon: list[i].users ? blueGem : greyGem
+        const markerLabel = list[i].users ? String(Object.keys(list[i].users).length) : String(0)
+        const markerIcon = list[i].users ? fullHeart : emptyHeart
+        gm.load((google) => {
+          var MarkerWithLabel = require('markerwithlabel')(google.maps);
+          vm.markers[i] = new MarkerWithLabel({
+            position: {lat: list[i].coordinates.latitude, lng: list[i].coordinates.longitude},
+            labelContent:  markerLabel,
+            icon: markerIcon,
+            map: vm.map,
+            labelAnchor: new google.maps.Point(15.5, 42),
+            labelClass: "marker-label", // the CSS class for the label
+          });
         });
         vm.markers[i].place = list[i];
         google.maps.event.addListener(vm.markers[i], 'click', function() {
-          console.log(list[i])
           vm.infoWindow.el.open(vm.map, this);
           vm.infoWindow.content = list[i]
         });
-        vm.markers[i].setMap(vm.map);
       }
     },
     getActivities(activities) {
