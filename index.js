@@ -4,11 +4,11 @@ const express = require('express')
 const serveStatic = require('serve-static')
 const path = require('path')
 const yelp = require('yelp-fusion');
-const config = require('../config.js');
+const config = require('config.js');
 const client = yelp.client(config.keys.YELP);
 const app = express()
 
-app.use("/", serveStatic ( path.join (__dirname, '../spa/dist')))
+app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
 
 // app.get('*', function (req, res) {
 //   res.sendFile(__dirname + '../spa/dist/index.html')
