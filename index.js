@@ -4,7 +4,7 @@ const express = require('express')
 const serveStatic = require('serve-static')
 const path = require('path')
 const yelp = require('yelp-fusion');
-const config = require('config.js');
+const config = require('./config.js');
 const client = yelp.client(config.keys.YELP);
 const app = express()
 
