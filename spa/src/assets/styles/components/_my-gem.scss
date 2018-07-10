@@ -6,7 +6,10 @@
   display: flex;
   min-height: 10rem;
   flex-flow: column;
-  margin: 1rem 0;
+}
+
+.c-my-gems__title {
+  text-align: center;
 }
 
 .c-my-gems__list {

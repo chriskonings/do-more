@@ -1,13 +1,16 @@
 <template>
   <div class="c-user">
     <template v-if="user">
-      <div class="c-user__details c-user__details--signed-in">
+      <button
+        @click.prevent="showUserMenu"
+        class="c-user__details c-user__details--signed-in"
+      >
         <div class="c-user__icon" :style="{ 'background-image': 'url(' + user.photoURL + ')' }">
         </div>
         <h2 class="c-user__name">
           {{user.displayName}}
         </h2>
-      </div>
+      </button>
       <button @click.prevent="signOut" class="c-btn c-btn--naked">
         Sign out
       </button>
@@ -60,6 +63,9 @@ export default {
         console.log(error)
       });
     },
+    showUserMenu() {
+      this.$emit('showUserMenu')
+    }
     // update() {
     //   const vm = this
     //   this.user.updateProfile({

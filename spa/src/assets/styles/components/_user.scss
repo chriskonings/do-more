@@ -7,9 +7,16 @@
   align-items: center;
   padding: 1rem;
   min-height: 6rem;
+  transition: .3s ease;
+  &:hover {
+    background-color: #eaeaea;
+  }
 }
 
 .c-user__details {
+  border: 0;
+  background: none;
+  cursor: pointer;
   flex: 1;
   margin-right: 1rem;
   display: flex;

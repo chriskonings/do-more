@@ -2,15 +2,15 @@
   <div class="o-root">
     <div v-if="!globalMap" class="spinner"></div>
     <main class="o-main" v-if="globalMap">
-      <User :user="user"/>
+      <User :user="user" @showUserMenu="menu = 3"/>
       <!--- user preferences here -->
       <div class="c-menu">
         <ul class="c-menu__tabs">
           <li class="c-menu__tab">
             <button
-              @click="menu.places = true"
+              @click="menu = 0"
               class="c-menu__tab-btn"
-              :class="{' c-menu__tab-btn--is-active': menu.places === true}"
+              :class="{' c-menu__tab-btn--is-active': menu === 0}"
             >
               Discover
             </button>
@@ -19,21 +19,21 @@
             <button
               :disabled="!user"
               class="c-menu__tab-btn"
-              @click="menu.places = false"
-              :class="{' c-menu__tab-btn--is-active': menu.places === false}"
+              @click="menu = 2"
+              :class="{' c-menu__tab-btn--is-active': menu === 2}"
             >
-              Saved
+              Hot
             </button>
           </li>
         </ul>
         <div class="c-menu__cont">
           <LocationSearch
             class="c-form__item"
-            v-show="menu.places"
+            v-show="menu === 0"
             :map="globalMap"
           />
           <FindPlaces
-            v-show="menu.places"
+            v-show="menu === 0"
             @emitMarkers="updateMarkers"
             @clearMarkers="clearMarkers"
             :user="user"
@@ -42,7 +42,8 @@
             :infoWindow="infoWindow"
             :claimPlace="claimPlace"
           />
-          <MyGems v-show="!menu.places" v-if="user" :user="user"/>
+          <Finds v-show="menu === 2"/>
+          <MyGems v-show="menu === 3" v-if="user" :user="user"/>
         </div>
       </div>
     </main>
@@ -67,6 +68,7 @@ import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import MyGems from './MyGems';
+import Finds from './Finds';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
@@ -78,9 +80,7 @@ export default {
     return {
       itinerary: null,
       user: null,
-      menu: {
-        places: true,
-      },
+      menu: 0,
       infoWindow: {
         el: null,
         content: null,
@@ -211,6 +211,7 @@ export default {
     FindPlaces,
     Map,
     MyGems,
+    Finds,
     InfoWindow,
     User,
   },

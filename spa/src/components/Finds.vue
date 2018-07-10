@@ -1,7 +1,7 @@
 <template>
   <div class="c-my-gems">
     <div class="c-my-gems__title">
-      <p>Places you have discovered</p>
+      <p>Popular places being shared</p>
     </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-gems__list">
@@ -21,6 +21,10 @@
           <div class="c-my-gem__details">
             <div class="c-my-gem__name">{{g.place.name}}</div>
             <div class="c-my-gem__loc">{{g.place.city}}, {{g.place.country}}</div>
+            <div>Shared by:</div>
+            <div v-if="g.users" v-for="(u, i) in g.users" :key="i">
+              {{u.displayName}}
+            </div>
           </div>
           <ul class="c-my-gem__btns">
             <li class="c-my-gem__btn">
@@ -31,21 +35,7 @@
                 Link
               </a>
             </li>
-            <li class="c-my-gem__btn">
-              <button
-                @click="deleting = i"
-                class="c-btn c-btn--naked">
-                Trash
-              </button>
-            </li>
           </ul>
-        </div>
-        <div v-if="deleting === i" class="c-my-gem__delete">
-          Are you sure you want to delete this gem?
-          <div class="c-my-gem__delete-btns">
-            <button @click="deleteGem(g)" class="c-btn c-btn--naked">Yes</button>
-            <button @click="deleting = null" class="c-btn c-btn--naked">No</button>
-          </div>
         </div>
       </li>
     </ul>
@@ -57,8 +47,8 @@ import { db } from '../firebase';
 
 /* eslint-disable */
 export default {
-  name: 'MyGems',
-  props: ['user'],
+  name: 'Finds',
+  props: [],
   data() {
     return {
       loading: false,
@@ -73,18 +63,7 @@ export default {
   methods: {
     async getGems() {
       this.loading = true;
-      this.$bindAsArray('gems', db.ref('gems').orderByChild('users/' + this.user.uid), null, () => this.loading = false)
-    },
-    deleteGem(g) {
-      const key = g['.key'];
-      const ref =  db.ref().child('gems').child(key);
-      ref.remove()
-        .then(() => {
-          console.log('Remove succeeded.');
-        })
-        .catch((error) => {
-          console.log('Remove failed: ', error.message);
-        });
+      this.$bindAsArray('gems', db.ref('gems'), null, () => this.loading = false)
     },
     imageLoaded(id) {
       this.$set(this.loadingImgs, id, false)

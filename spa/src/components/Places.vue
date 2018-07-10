@@ -8,17 +8,17 @@
         @mouseover="highlight(p, p.id, i)"
       >
         <div class="c-my-gem__cont">
-        <div
-          class="c-my-gem__img-container"
-          :class="{'is-loading': loadingImgs[p.id]}"
-        >
-          <img
-            v-show="!loadingImgs[p.id]"
-            class="c-my-gem__img"
-            :src="p.image_url"
-            @load="imageLoaded(p.id)"
-            alt="place-photo"/>
-        </div>
+          <div
+            class="c-my-gem__img-container"
+            :class="{'is-loading': loadingImgs[p.id]}"
+          >
+            <img
+              v-show="!loadingImgs[p.id]"
+              class="c-my-gem__img"
+              :src="p.image_url"
+              @load="imageLoaded(p.id)"
+              alt="place-photo"/>
+          </div>
           <div class="c-my-gem__details">
             <div class="c-my-gem__name">{{p.name}}</div>
             Shared by:
