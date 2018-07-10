@@ -42,7 +42,7 @@
             :infoWindow="infoWindow"
             :claimPlace="claimPlace"
           />
-          <Finds v-show="menu === 2"/>
+          <Finds v-if="menu === 2"/>
           <MyGems v-show="menu === 3" v-if="user" :user="user"/>
         </div>
       </div>
