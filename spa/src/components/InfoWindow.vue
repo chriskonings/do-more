@@ -46,13 +46,18 @@ export default {
       loading: true,
     }
   },
+  computed: {
+    id() {
+      if (this.place) return this.place.id
+    }
+  },
   watch: {
     itineraries() {
       if (this.itineraries.length) {
         this.itinerary = this.itineraries[0]['.key']
       }
     },
-    place() {
+    id() {
       this.loading = true
     }
   }

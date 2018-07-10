@@ -118,20 +118,20 @@ export default {
         success()
       });
     },
-    claimPlace(newPlace) {
+    claimPlace(p) {
       // To do - if ID is found in gems DB then just update the users array
-      let place = {}
-      if (newPlace.place) {
+      let newPlace = {}
+      if (p.place) {
         let city = null
         let country = null
-        for (var addr of newPlace.place.address_components) {
+        for (var addr of p.place.address_components) {
           if (addr.types.includes('postal_town')) {
             city = addr.short_name;
           } else if (addr.types.includes('country')) {
             country = addr.short_name;
           }
         }
-        place = {
+        newPlace = {
           place: {
             users: {
               [this.user.uid]: {
@@ -140,22 +140,22 @@ export default {
                 photoURL: this.user.photoURL,
               },
             },
-            id: newPlace.place.id,
-            name: newPlace.place.name,
+            id: p.place.id,
+            name: p.place.name,
             city: city,
             country: country,
             pos: {
-              lat: newPlace.place.geometry.location.lat(),
-              lng: newPlace.place.geometry.location.lng(),
+              lat: p.place.geometry.location.lat(),
+              lng: p.place.geometry.location.lng(),
             },
-            image_url: typeof newPlace.place.photos !== 'undefined'
-            ? newPlace.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+            image_url: typeof p.place.photos !== 'undefined'
+            ? p.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
             : '',
-            link: newPlace.url,
+            link: p.url,
           }
         };
       } else {
-        place = {
+        newPlace = {
           users: {
             [this.user.uid]: {
               id: this.user.uid,
@@ -164,20 +164,20 @@ export default {
             },
           },
           place: {
-            id: newPlace.id,
-            name: newPlace.name,
-            city: newPlace.location.city,
-            country: newPlace.location.country,
+            id: p.id,
+            name: p.name,
+            city: p.location.city,
+            country: p.location.country,
             pos: {
-              lat: newPlace.coordinates.latitude,
-              lng: newPlace.coordinates.longitude,
+              lat: p.coordinates.latitude,
+              lng: p.coordinates.longitude,
             },
-            image_url: newPlace.image_url,
-            link: newPlace.url,
+            image_url: p.image_url,
+            link: p.url,
           },
         };
       }
-      db.ref('gems').push(place);
+      db.ref('gems').push(newPlace);
     },
     getPlaces(list) {
       this.itineraryList = list;
