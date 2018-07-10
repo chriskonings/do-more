@@ -1,0 +1,20 @@
+{
+  "name": "find-with-me",
+  "version": "1.0.0",
+  "description": "find things to do from people like you",
+  "main": "/server/index.js",
+  "scripts": {
+    "start": "cd ./server && npm run start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chriskonings/do-more.git"
+  },
+  "author": "Chris Konings",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chriskonings/do-more/issues"
+  },
+  "homepage": "https://github.com/chriskonings/do-more#readme"
+}
