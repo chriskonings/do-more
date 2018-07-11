@@ -33,7 +33,7 @@ app.get('/api', function(req, res) {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
       console.log(e);
-      res.json(e.body.businesses)
+      res.json(e)
     });
   } else {
     search = yelpClient.search({
@@ -47,7 +47,7 @@ app.get('/api', function(req, res) {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
       console.log(e)
-      res.json(e.response.body)
+      res.json(e)
     });
   }
   return search
