@@ -3,10 +3,8 @@
 import firebase from 'firebase';
 import 'firebase/auth';
 
-const config = require('../../config.js');
-
 const firebaseApp = firebase.initializeApp({
-  apiKey: config.keys.FIREBASE,
+  apiKey: keys.FIREBASE_KEY,
   authDomain: 'do-more-ecc5c.firebaseapp.com',
   databaseURL: 'https://do-more-ecc5c.firebaseio.com/',
   projectId: 'do-more-ecc5c',

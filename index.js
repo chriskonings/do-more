@@ -4,11 +4,18 @@ const express = require('express')
 const serveStatic = require('serve-static')
 const path = require('path')
 const yelp = require('yelp-fusion');
-const config = require('./config.js');
-const client = yelp.client(config.keys.YELP);
+
+// if argument is dev get local file
+// else return set to heroku var
+
+const yelpKey = process.argv[2] ? require('./config.js').keys.YELP : process.env.YELP_KEY
+
+const yelpClient = yelp.client(yelpKey);
 const app = express()
 
-app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
+if (!process.argv[2]) {
+  app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
+}
 
 // app.get('*', function (req, res) {
 //   res.sendFile(__dirname + '../spa/dist/index.html')
@@ -19,7 +26,7 @@ app.get('/api', function(req, res) {
   const calcRadius = radius < 40000 ? radius : null
   let search
   if (term) {
-    search = client.search({
+    search = yelpClient.search({
       sort_by: sortBy,
       limit: 25,
       latitude: lat,
@@ -34,7 +41,7 @@ app.get('/api', function(req, res) {
       console.log(e);
     });
   } else {
-    search = client.search({
+    search = yelpClient.search({
       sort_by: sortBy,
       limit: 25,
       latitude: lat,
@@ -51,5 +58,5 @@ app.get('/api', function(req, res) {
   return search
 })
 
-const port = process.env.PORT || 3000
+const port = 3000
 app.listen(port, () => console.log('Listening on port 3000'))

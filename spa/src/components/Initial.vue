@@ -110,7 +110,7 @@ export default {
     async clearMarkers() {
       // To do - only remove markers not found in list of places
       const vm = this
-      return new Promise(function (success, reject){
+      return new Promise((success, reject) => {
         for (let i = 0; i < vm.globalMarkers.length; i++) {
           vm.globalMarkers[i].setMap(null);
         }

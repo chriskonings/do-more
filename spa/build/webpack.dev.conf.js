@@ -47,6 +47,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   plugins: [
     new webpack.ProvidePlugin({
       gm: 'google-maps',
+      'keys': 'keys'
     }),
     new webpack.DefinePlugin({
       'process.env': require('../config/dev.env')

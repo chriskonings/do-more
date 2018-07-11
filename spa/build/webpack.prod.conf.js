@@ -35,7 +35,8 @@ const webpackConfig = merge(baseWebpackConfig, {
       gm: 'google-maps',
     }),
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': env,
+      keys: env,
     }),
     new UglifyJsPlugin({
       uglifyOptions: {

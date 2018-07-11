@@ -5,9 +5,8 @@
 </template>
 
 <script>
-const config = require('../../config.js');
-gm.KEY = config.keys.GOOGLEMAPS;
-gm.LIBRARIES = ['places', 'geometry'];
+gm.KEY = keys.GOOGLEMAPS_KEY; // eslint-disable-line no-undef
+gm.LIBRARIES = ['places', 'geometry']; // eslint-disable-line no-undef
 
 export default {
   name: 'App',
@@ -17,9 +16,9 @@ export default {
     };
   },
   created() {
-    gm.load((google) => {
-      this.googleMaps = google.maps
+    gm.load((google) => { // eslint-disable-line no-undef
+      this.googleMaps = google.maps;
     });
-  }
+  },
 };
 </script>
