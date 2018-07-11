@@ -14,6 +14,12 @@ const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
+  resolve: {
+    extensions: ['.js'],
+    alias: {
+      'keys': path.resolve(__dirname, '../../config.js')  // <-- When you build or restart dev-server, you'll get an error if the path to your utils.js file is incorrect.
+    }
+  },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
   },

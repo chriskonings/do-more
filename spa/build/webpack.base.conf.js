@@ -36,7 +36,6 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      'keys': path.resolve(__dirname, '../../config.js')  // <-- When you build or restart dev-server, you'll get an error if the path to your utils.js file is incorrect.
     }
   },
   module: {
