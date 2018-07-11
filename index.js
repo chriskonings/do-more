@@ -1,16 +1,12 @@
 'use strict';
 
-const express = require('express')
-const serveStatic = require('serve-static')
-const path = require('path')
+const express = require('express');
+const serveStatic = require('serve-static');
+const path = require('path');
 const yelp = require('yelp-fusion');
-
-// if argument is dev get local file
-// else return set to heroku var
-
+const app = express();
 const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
 const yelpClient = yelp.client(yelpKey);
-const app = express()
 
 if (!process.argv[2]) {
   app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
@@ -36,8 +32,8 @@ app.get('/api', function(req, res) {
     }).then(response => {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
-      res.json(e.body.businesses)
       console.log(e);
+      res.json(e.body.businesses)
     });
   } else {
     search = yelpClient.search({
@@ -50,8 +46,8 @@ app.get('/api', function(req, res) {
     }).then(response => {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
-      res.json(e.jsonBody)
-      console.log(e);
+      console.log(e)
+      res.json(e.response.body)
     });
   }
   return search
@@ -59,4 +55,4 @@ app.get('/api', function(req, res) {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => console.log('Listening on port 3000'));
+app.listen(port, () => console.log('Listening on port ' + port));
