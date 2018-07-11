@@ -101,7 +101,7 @@ export default {
       const mapLat = await this.map.center.lat();
       const mapLng = await this.map.center.lng();
       try {
-        const response = await axios.get(`/api`, {
+        const response = await axios.get('/api', {
           params: {
             lat: mapLat,
             lng: mapLng,
