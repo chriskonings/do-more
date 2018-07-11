@@ -18,7 +18,7 @@ if (!process.argv[2]) {
 
 app.get('/api', function(req, res) {
   const {lat, lng, term, radius, sortBy, offset} = req.query
-  console.log(req, req.query)
+  console.log(req.headers, req.query)
   const calcRadius = radius < 40000 ? radius : null
   let search
   if (term) {
@@ -33,8 +33,8 @@ app.get('/api', function(req, res) {
     }).then(response => {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
-      console.log(e);
       res.json(e)
+      console.log(e);
     });
   } else {
     search = yelpClient.search({
@@ -47,8 +47,8 @@ app.get('/api', function(req, res) {
     }).then(response => {
       res.json(response.jsonBody.businesses)
     }).catch(e => {
-      console.log(e)
       res.json(e)
+      console.log(e)
     });
   }
   return search
