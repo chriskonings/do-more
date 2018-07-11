@@ -8,7 +8,7 @@ const yelp = require('yelp-fusion');
 // if argument is dev get local file
 // else return set to heroku var
 
-const yelpKey = process.argv[2] ? require('./config.js').keys.YELP : process.env.YELP_KEY
+const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
 
 const yelpClient = yelp.client(yelpKey);
 const app = express()

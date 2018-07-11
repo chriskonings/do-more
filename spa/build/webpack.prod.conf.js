@@ -32,11 +32,12 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.ProvidePlugin({
-      gm: 'google-maps',
-      'keys': process.env
+      gm: 'google-maps'
     }),
     new webpack.DefinePlugin({
       'process.env': env,
+      'GOOGLEMAPS_KEY': JSON.stringify(process.env.GOOGLEMAPS_KEY),
+      'FIREBASE_KEY': JSON.stringify(process.env.FIREBASE_KEY)
     }),
     new UglifyJsPlugin({
       uglifyOptions: {

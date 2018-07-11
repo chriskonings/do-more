@@ -5,7 +5,8 @@
 </template>
 
 <script>
-gm.KEY = keys.GOOGLEMAPS_KEY; // eslint-disable-line no-undef
+console.log(GOOGLEMAPS_KEY)
+gm.KEY = GOOGLEMAPS_KEY; // eslint-disable-line no-undef
 gm.LIBRARIES = ['places', 'geometry']; // eslint-disable-line no-undef
 
 export default {

@@ -9,17 +9,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const keys = require('../../config.js')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
-  resolve: {
-    extensions: ['.js'],
-    alias: {
-      'keys': path.resolve(__dirname, '../../config.js')  // <-- When you build or restart dev-server, you'll get an error if the path to your utils.js file is incorrect.
-    }
-  },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
   },
@@ -52,11 +47,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      gm: 'google-maps',
-      'keys': 'keys'
+      gm: 'google-maps'
     }),
     new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env')
+      'process.env': require('../config/dev.env'),
+      'GOOGLEMAPS_KEY': JSON.stringify(keys.GOOGLEMAPS_KEY),
+      'FIREBASE_KEY': JSON.stringify(keys.FIREBASE_KEY)
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.

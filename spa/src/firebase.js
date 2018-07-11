@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import 'firebase/auth';
 
 const firebaseApp = firebase.initializeApp({
-  apiKey: keys.FIREBASE_KEY,
+  apiKey: FIREBASE_KEY,
   authDomain: 'do-more-ecc5c.firebaseapp.com',
   databaseURL: 'https://do-more-ecc5c.firebaseio.com/',
   projectId: 'do-more-ecc5c',
