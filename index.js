@@ -18,6 +18,7 @@ if (!process.argv[2]) {
 
 app.get('/api', function(req, res) {
   const {lat, lng, term, radius, sortBy, offset} = req.query
+  console.log(req.query)
   const calcRadius = radius < 40000 ? radius : null
   let search
   if (term) {
