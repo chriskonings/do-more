@@ -9,7 +9,7 @@ const yelp = require('yelp-fusion');
 // else return set to heroku var
 
 const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
-
+console.log('MY YELP KEY', yelpKey)
 const yelpClient = yelp.client(yelpKey);
 const app = express()
 
@@ -49,6 +49,7 @@ app.get('/api', function(req, res) {
       offset: offset,
       radius: calcRadius
     }).then(response => {
+      console.log(response)
       res.json(response.jsonBody.businesses)
     }).catch(e => {
       res.json(e.body.businesses)
