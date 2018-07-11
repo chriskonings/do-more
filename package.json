@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js dev",
-    "postinstall": "cd ./spa && npm run build"
+    "postinstall": "cd spa && npm install | npm run build"
   },
   "repository": {
     "type": "git",
