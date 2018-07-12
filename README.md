@@ -1,4 +1,4 @@
-# Find & share hidden gems in cities
+# Find things to do from people like you
 
 I was googling too much trying to find places to go when I travelled, review sites and "top X" articles just weren't cutting it for me, so I decided to build an app for people to collect, share and discover places from other people that had been there.
 
@@ -15,14 +15,14 @@ Note: local server and spa must be running simultaneously in order to use front-
 ### To Do
 
 #### Features
+- [ ] Add "find" sharing with other users
+- [x] Add "hot finds" feature
+- [ ] Sort "finds" by location in "my finds"
+- [ ] Add dropdown to filter by location in "my finds"
 - [ ] Add "been there" tagging, to tell when someone has actually been to the place and how many.
-- [ ] Add "gem" sharing with other users
-- [ ] Add "discover gems" feature
-- [ ] Sort "gems" by location in "my gems"
-- [ ] Add dropdown to filter by location in "my gems"
 
 #### Tech
-- [ ] Deploy to server
+- [x] Deploy to server
 - [ ] Set up continuous integration (Jenkins) - [Dev -> Staging -> Production]
 - [ ] Migrate (from Google Maps) to Mapbox
 - [ ] Migrate (from Firebase) to MongoDB

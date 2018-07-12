@@ -42,8 +42,8 @@
             :infoWindow="infoWindow"
             :claimPlace="claimPlace"
           />
-          <Finds v-if="menu === 2"/>
-          <MyGems v-show="menu === 3" v-if="user" :user="user"/>
+          <HotList v-if="menu === 2"/>
+          <MyFinds v-if="user && menu === 3" :user="user"/>
         </div>
       </div>
     </main>
@@ -67,11 +67,72 @@ import firebase from 'firebase';
 import Map from './Map';
 import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
-import MyGems from './MyGems';
-import Finds from './Finds';
+import MyFinds from './MyFinds';
+import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
+
+function buildPlaceObj (p, user) {
+  let newPlace = {}
+  if (p.place) {
+    let city = null
+    let country = null
+    for (var addr of p.place.address_components) {
+      if (addr.types.includes('locality')) {
+        city = addr.short_name;
+      } else if (addr.types.includes('country')) {
+        country = addr.short_name;
+      }
+    }
+    newPlace = {
+      users: {
+        [user.uid]: {
+          id: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        },
+      },
+      place: {
+        id: p.place.id,
+        name: p.place.name,
+        city: city,
+        country: country,
+        pos: {
+          lat: p.place.geometry.location.lat(),
+          lng: p.place.geometry.location.lng(),
+        },
+        image_url: typeof p.place.photos !== 'undefined'
+        ? p.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+        : '',
+        link: p.url,
+      }
+    };
+  } else {
+    newPlace = {
+      users: {
+        [user.uid]: {
+          id: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        },
+      },
+      place: {
+        id: p.id,
+        name: p.name,
+        city: p.location.city,
+        country: p.location.country,
+        pos: {
+          lat: p.coordinates.latitude,
+          lng: p.coordinates.longitude,
+        },
+        image_url: p.image_url,
+        link: p.url,
+      },
+    };
+  }
+  return newPlace
+}
 
 export default {
   name: 'Initial',
@@ -80,6 +141,8 @@ export default {
     return {
       itinerary: null,
       user: null,
+      userFinds: [],
+      userFindsIDs: [],
       menu: 0,
       infoWindow: {
         el: null,
@@ -92,8 +155,26 @@ export default {
     };
   },
   async created() {
-    const vm = this;
-    firebase.auth().onAuthStateChanged((user) => this.user = user);
+    firebase.auth().onAuthStateChanged((user) => {
+      const userObj = {
+        uid: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      }
+      db.ref('users/' + user.uid).once('value').then((snap) => {
+        if (snap.val()) {
+          this.user = snap.val()
+        } else {
+          db.ref('users/' + user.uid).set(userObj, (err) => {
+            if (err) {
+              console.log(err)
+            } else {
+              this.user = userObj
+            }
+          });
+        }
+      });
+    });
     gm.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
         content: this.$refs.infoW.$el,
@@ -118,66 +199,41 @@ export default {
         success()
       });
     },
-    claimPlace(p) {
-      // To do - if ID is found in gems DB then just update the users array
-      let newPlace = {}
+    async claimPlace(p) {
+      let alreadySaved = true
+      let placeRef
+      let placeKey
       if (p.place) {
-        let city = null
-        let country = null
-        for (var addr of p.place.address_components) {
-          if (addr.types.includes('postal_town')) {
-            city = addr.short_name;
-          } else if (addr.types.includes('country')) {
-            country = addr.short_name;
-          }
-        }
-        newPlace = {
-          place: {
-            users: {
-              [this.user.uid]: {
-                id: this.user.uid,
-                displayName: this.user.displayName,
-                photoURL: this.user.photoURL,
-              },
-            },
-            id: p.place.id,
-            name: p.place.name,
-            city: city,
-            country: country,
-            pos: {
-              lat: p.place.geometry.location.lat(),
-              lng: p.place.geometry.location.lng(),
-            },
-            image_url: typeof p.place.photos !== 'undefined'
-            ? p.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-            : '',
-            link: p.url,
-          }
-        };
+        placeRef = db.ref('finds').orderByChild('place/id').equalTo(p.place.id);
       } else {
-        newPlace = {
-          users: {
-            [this.user.uid]: {
-              id: this.user.uid,
-              displayName: this.user.displayName,
-              photoURL: this.user.photoURL,
-            },
-          },
-          place: {
-            id: p.id,
-            name: p.name,
-            city: p.location.city,
-            country: p.location.country,
-            pos: {
-              lat: p.coordinates.latitude,
-              lng: p.coordinates.longitude,
-            },
-            image_url: p.image_url,
-            link: p.url,
-          },
-        };
+        placeRef = db.ref('finds').orderByChild('place/id').equalTo(p.id);
       }
-      db.ref('gems').push(newPlace);
+      placeRef.once('value').then((snap) => {
+        if (snap.val()) {
+          placeKey = Object.keys(snap.val())[0];
+          alreadySaved =  this.user.saved ? this.user.saved[placeKey] : false
+          db.ref('finds/' + placeKey + '/users/' + this.user.uid).set({
+            uid: this.user.uid,
+            displayName: this.user.displayName,
+            photoURL: this.user.photoURL
+          })
+          // update the place users list
+        } else {
+          const placeObj = buildPlaceObj(p, this.user)
+          db.ref('finds').push(placeObj).then((snap) => placeKey = snap.key)
+        }
+        if (!alreadySaved) {
+          if (this.user.saved) {
+            this.user.saved[placeKey] = placeKey
+          } else {
+            this.user.saved = {}
+            this.user.saved[placeKey] = placeKey
+          }
+          db.ref('users/' + this.user.uid).child('saved/' + placeKey).set(placeKey)
+        } else {
+          console.log('place is already saved')
+        }
+      });
     },
     getPlaces(list) {
       this.itineraryList = list;
@@ -210,8 +266,8 @@ export default {
     LocationSearch,
     FindPlaces,
     Map,
-    MyGems,
-    Finds,
+    MyFinds,
+    HotList,
     InfoWindow,
     User,
   },

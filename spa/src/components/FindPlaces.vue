@@ -119,7 +119,7 @@ export default {
     },
     getUsers(p, id) {
       const vm = this
-      var placeRef = db.ref('gems').orderByChild('place/id').equalTo(id);
+      var placeRef = db.ref('finds').orderByChild('place/id').equalTo(id);
       placeRef.on('value', function(snapshot) {
         if (snapshot.val()) {
           for (var s in snapshot.val()) {

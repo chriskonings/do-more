@@ -1,38 +1,38 @@
 <template>
-  <div class="c-my-gems">
-    <ul class="c-my-gems__list">
+  <div class="c-my-finds">
+    <ul class="c-my-finds__list">
       <li
-        class="c-my-gem"
+        class="c-my-find"
         v-for="(p, i) in places"
         :key="i"
         @mouseover="highlight(p, p.id, i)"
       >
-        <div class="c-my-gem__cont">
+        <div class="c-my-find__cont">
           <div
-            class="c-my-gem__img-container"
+            class="c-my-find__img-container"
             :class="{'is-loading': loadingImgs[p.id]}"
           >
             <img
               v-show="!loadingImgs[p.id]"
-              class="c-my-gem__img"
+              class="c-my-find__img"
               :src="p.image_url"
               @load="imageLoaded(p.id)"
               alt="place-photo"/>
           </div>
-          <div class="c-my-gem__details">
-            <div class="c-my-gem__name">{{p.name}}</div>
+          <div class="c-my-find__details">
+            <div class="c-my-find__name">{{p.name}}</div>
             Shared by:
             <div v-if="p.users" v-for="(u, i) in p.users" :key="i">
               {{u.displayName}}
             </div>
           </div>
-          <ul class="c-my-gem__btns">
-            <li class="c-my-gem__btn">
+          <ul class="c-my-find__btns">
+            <li class="c-my-find__btn">
               <a :href="p.url" target="_blank" class="c-btn c-btn--naked">
                 Link
               </a>
             </li>
-            <li class="c-my-gem__btn">
+            <li class="c-my-find__btn">
               <button
                 :disabled="!user"
                 class="c-btn c-btn--naked"
