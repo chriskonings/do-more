@@ -75,8 +75,10 @@ export default {
       this.loading = true;
       for (const key in this.user.saved) {
         db.ref('finds/' + key).once('value').then((snap) => {
-          this.$set(this.finds, key, snap.val())
-          this.$set(this.loadingImgs, key, true)
+          if (snap.val()) {
+            this.$set(this.finds, key, snap.val())
+            this.$set(this.loadingImgs, key, true)
+          }
         });
       }
       this.loading = false;
