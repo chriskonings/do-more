@@ -9,13 +9,13 @@
         <div class="c-my-find__cont">
           <div
             class="c-my-find__img-container"
-            :class="{'is-loading': loadingImgs[g.place.id]}"
+            :class="{'is-loading': loadingImgs[k]}"
           >
             <img
-              v-show="!loadingImgs[g.place.id]"
+              v-show="!loadingImgs[k]"
               class="c-my-find__img"
               :src="g.place.image_url"
-              @load="imageLoaded(g.place.id)"
+              @load="imageLoaded(k)"
               alt="place-photo"/>
           </div>
           <div class="c-my-find__details">
@@ -76,6 +76,7 @@ export default {
       for (const key in this.user.saved) {
         db.ref('finds/' + key).once('value').then((snap) => {
           this.$set(this.finds, key, snap.val())
+          this.$set(this.loadingImgs, key, true)
         });
       }
       this.loading = false;
@@ -94,19 +95,9 @@ export default {
       //     console.log('Remove failed: ', error.message);
       //   });
     },
-    imageLoaded(id) {
-      this.$set(this.loadingImgs, id, false)
+    imageLoaded(key) {
+      this.$set(this.loadingImgs, key, false)
     },
-  },
-  watch: {
-    // finds(list) {
-    //   const keys = Object.keys(this.loadingImgs)
-    //   list.map((g) => {
-    //     if (!keys.includes(g.place.id)) {
-    //       this.$set(this.loadingImgs, g.place.id, true)
-    //     }
-    //   })
-    // }
   },
 };
 </script>

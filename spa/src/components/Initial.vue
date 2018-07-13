@@ -73,6 +73,16 @@ import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
 
+function addToSaved (user, key) {
+  if (user.saved) {
+    user.saved[key] = key
+  } else {
+    user.saved = {}
+    user.saved[key] = key
+  }
+  db.ref('users/' + user.uid).child('saved/' + key).set(key)
+}
+
 function buildPlaceObj (p, user) {
   let newPlace = {}
   if (p.place) {
@@ -211,27 +221,17 @@ export default {
       placeRef.once('value').then((snap) => {
         if (snap.val()) {
           placeKey = Object.keys(snap.val())[0];
-          alreadySaved =  this.user.saved ? this.user.saved[placeKey] : false
+          addToSaved(this.user, placeKey)
           db.ref('finds/' + placeKey + '/users/' + this.user.uid).set({
             uid: this.user.uid,
             displayName: this.user.displayName,
             photoURL: this.user.photoURL
           })
-          // update the place users list
         } else {
           const placeObj = buildPlaceObj(p, this.user)
-          db.ref('finds').push(placeObj).then((snap) => placeKey = snap.key)
-        }
-        if (!alreadySaved) {
-          if (this.user.saved) {
-            this.user.saved[placeKey] = placeKey
-          } else {
-            this.user.saved = {}
-            this.user.saved[placeKey] = placeKey
-          }
-          db.ref('users/' + this.user.uid).child('saved/' + placeKey).set(placeKey)
-        } else {
-          console.log('place is already saved')
+          db.ref('finds').push(placeObj).then((snap) => {
+            addToSaved(this.user, snap.key)
+          })
         }
       });
     },
