@@ -82,18 +82,26 @@ export default {
       this.loading = false;
     },
     deletefind(key) {
-      console.log(this.user.uid)
-      db.ref('finds/' + key).child('users').child(this.user.uid).remove()
-      db.ref('users/' + this.user.uid).child('saved').child(key).remove()
+      db.ref('finds/' + key)
+        .child('users')
+        .child(this.user.uid).remove()
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+      db.ref('users/' + this.user.uid)
+        .child('saved')
+        .child(key).remove()
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
       this.$delete(this.finds, key)
-      // const ref =  db.ref().child('finds').child(key);
-      // ref.remove()
-      //   .then(() => {
-      //     console.log('Remove succeeded.');
-      //   })
-      //   .catch((error) => {
-      //     console.log('Remove failed: ', error.message);
-      //   });
+      this.$delete(this.user.saved, key)
     },
     imageLoaded(key) {
       this.$set(this.loadingImgs, key, false)
