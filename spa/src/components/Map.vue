@@ -29,30 +29,37 @@ export default {
   },
   mounted() {
     this.initMap()
-    this.getLocation()
   },
   methods: {
     initMap() {
-      const vm = this
-      vm.map = new google.maps.Map(this.$refs.map, {
-        zoom: 17,
+      var myStyles =[{
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [
+          {visibility: "off"},
+        ],
+      }];
+      this.map = new google.maps.Map(this.$refs.map, {
+        zoom: 15,
         center: this.position,
         mapTypeControl: false,
+        styles: myStyles,
       })
-      const service = new google.maps.places.PlacesService(vm.map);
-      google.maps.event.addListener(vm.map, 'click', function(event) {
+      this.getLocation()
+      const service = new google.maps.places.PlacesService(this.map);
+      google.maps.event.addListener(this.map, 'click', (event) => {
         if (event.placeId) {
           event.stop();
-          service.getDetails({placeId: event.placeId}, function(place, status) {
+          service.getDetails({placeId: event.placeId}, (place, status) => {
             var marker = new google.maps.Marker({
               position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
-              map: vm.map,
+              map: this.map,
               title: place.name,
               visible: false,
             });
-            vm.infoWindow.el.open(vm.map, marker);
+            this.infoWindow.el.open(this.map, marker);
             if (status === 'OK') {
-              vm.infoWindow.content = {
+              this.infoWindow.content = {
                 name: place.name,
                 phone: place.formatted_phone_number,
                 place: place,
@@ -71,7 +78,7 @@ export default {
       if (navigator.geolocation) {
         const options = {
           enableHighAccuracy: true,
-          timeout: 5000,
+          timeout: 10000,
           maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition((pos) => {

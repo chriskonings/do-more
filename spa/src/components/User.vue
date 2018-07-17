@@ -27,7 +27,7 @@
         <h2 class="c-user__name">
           Guest
         </h2>
-        <span>Sign in to claim places</span>
+        <span>Sign in to save places</span>
       </div>
       <button @click.prevent="signIn" class="c-btn c-btn--naked">
         Sign in

@@ -5,7 +5,7 @@
     </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-finds__list">
-      <li class="c-my-find" v-for="(g, i) in finds" :key="i">
+      <li class="c-my-find" v-for="(g, i) in sortedFinds" :key="i">
         <div class="c-my-find__cont">
           <div
             class="c-my-find__img-container"
@@ -21,10 +21,12 @@
           <div class="c-my-find__details">
             <div class="c-my-find__name">{{g.place.name}}</div>
             <div class="c-my-find__loc">{{g.place.city}}, {{g.place.country}}</div>
-            <div>Shared by:</div>
-            <div v-if="g.users" v-for="(u, i) in g.users" :key="i">
-              {{u.displayName}}
-            </div>
+            <template v-if="g.users">
+              <div v-for="(u, i) in g.users" :key="i">
+                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
+                </div>
+              </div>
+            </template>
           </div>
           <ul class="c-my-find__btns">
             <li class="c-my-find__btn">
@@ -34,6 +36,14 @@
                 class="c-btn c-btn--naked">
                 Link
               </a>
+            </li>
+            <li class="c-my-find__btn">
+              <button
+                :disabled="!user"
+                class="c-btn c-btn--naked"
+                @click.prevent="savePlace(g)">
+                Save
+              </button>
             </li>
           </ul>
         </div>
@@ -48,7 +58,7 @@ import { db } from '../firebase';
 /* eslint-disable */
 export default {
   name: 'HotList',
-  props: [],
+  props: ['savePlace', 'user'],
   data() {
     return {
       loading: false,
@@ -79,6 +89,20 @@ export default {
       })
     }
   },
+  computed: {
+    sortedFinds: function() {
+      function compareUserCount(a, b) {
+        const aUsers = a.users ? Object.keys(a.users).length : 0
+        const bUsers = b.users ? Object.keys(b.users).length : 0
+        if (aUsers < bUsers) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+      return this.finds.sort(compareUserCount);
+    }
+  }
 };
 </script>
 

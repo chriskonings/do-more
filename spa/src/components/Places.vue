@@ -21,10 +21,12 @@
           </div>
           <div class="c-my-find__details">
             <div class="c-my-find__name">{{p.name}}</div>
-            Shared by:
-            <div v-if="p.users" v-for="(u, i) in p.users" :key="i">
-              {{u.displayName}}
-            </div>
+            <template v-if="p.users">
+              <div v-for="(u, i) in p.users" :key="i">
+                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
+                </div>
+              </div>
+            </template>
           </div>
           <ul class="c-my-find__btns">
             <li class="c-my-find__btn">
@@ -36,8 +38,8 @@
               <button
                 :disabled="!user"
                 class="c-btn c-btn--naked"
-                @click.prevent="claimPlace(p)">
-                Claim
+                @click.prevent="savePlace(p)">
+                Save
               </button>
             </li>
           </ul>
@@ -62,7 +64,7 @@ export default {
   name: 'Places',
   props: [
     'places',
-    'claimPlace',
+    'savePlace',
     'user',
     'page',
     'loading',

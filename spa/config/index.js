@@ -12,10 +12,14 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
+      '/getYelpResults': {
         target: 'http://localhost:' + port,
         changeOrigin: true
-      }
+      },
+      '/getPlacesUsers': {
+        target: 'http://localhost:' + port,
+        changeOrigin: true
+      },
     },
 
     // Various Dev Server settings

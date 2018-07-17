@@ -26,7 +26,7 @@
           </a>
         </li>
         <li class="c-info-window__link">
-          <button class="c-btn c-btn--naked" @click.prevent="claimPlace(place)">
+          <button class="c-btn c-btn--naked" @click.prevent="savePlace(place)">
             Save
           </button>
         </li>
@@ -39,7 +39,7 @@
 /* eslint-disable */
 export default {
   name: 'InfoWindow',
-  props: ['place', 'claimPlace', 'itineraries'],
+  props: ['place', 'savePlace', 'itineraries'],
   data() {
     return {
       itinerary: null,

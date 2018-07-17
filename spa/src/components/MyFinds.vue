@@ -21,6 +21,12 @@
           <div class="c-my-find__details">
             <div class="c-my-find__name">{{g.place.name}}</div>
             <div class="c-my-find__loc">{{g.place.city}}, {{g.place.country}}</div>
+            <template v-if="g.users">
+              <div v-for="(u, i) in g.users" :key="i">
+                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
+                </div>
+              </div>
+            </template>
           </div>
           <ul class="c-my-find__btns">
             <li class="c-my-find__btn">

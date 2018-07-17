@@ -40,9 +40,13 @@
             :map="globalMap"
             :radius="radius"
             :infoWindow="infoWindow"
-            :claimPlace="claimPlace"
+            :savePlace="savePlace"
           />
-          <HotList v-if="menu === 2"/>
+          <HotList
+            v-if="menu === 2"
+            :savePlace="savePlace"
+            :user="user"
+          />
           <MyFinds v-if="user && menu === 3" :user="user"/>
         </div>
       </div>
@@ -57,7 +61,7 @@
     <InfoWindow
       ref="infoW"
       :place="infoWindow.content"
-      :claimPlace="claimPlace"
+      :savePlace="savePlace"
     />
   </div>
 </template>
@@ -209,7 +213,7 @@ export default {
         success()
       });
     },
-    async claimPlace(p) {
+    async savePlace(p) {
       let alreadySaved = true
       let placeRef
       let placeKey
