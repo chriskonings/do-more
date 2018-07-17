@@ -77,6 +77,29 @@ import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
 
+function getUser (user) {
+  const userObj = {
+    uid: user.uid,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+  }
+  // check if user exists in user DB, if it does return it
+  // else set the user in the DB and return
+  return db.ref('users/' + user.uid).once('value').then((snap) => {
+    if (snap.val()) {
+      return snap.val()
+    } else {
+      db.ref('users/' + user.uid).set(userObj, (err) => {
+        if (err) {
+          console.log(err)
+        } else {
+          return userObj
+        }
+      });
+    }
+  });
+}
+
 function addToSaved (user, key) {
   if (user.saved) {
     user.saved[key] = key
@@ -169,25 +192,8 @@ export default {
     };
   },
   async created() {
-    firebase.auth().onAuthStateChanged((user) => {
-      const userObj = {
-        uid: user.uid,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-      }
-      db.ref('users/' + user.uid).once('value').then((snap) => {
-        if (snap.val()) {
-          this.user = snap.val()
-        } else {
-          db.ref('users/' + user.uid).set(userObj, (err) => {
-            if (err) {
-              console.log(err)
-            } else {
-              this.user = userObj
-            }
-          });
-        }
-      });
+    firebase.auth().onAuthStateChanged(user => {
+      getUser(user).then(userObj => {this.user = userObj});
     });
     gm.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
@@ -214,17 +220,11 @@ export default {
       });
     },
     async savePlace(p) {
-      let alreadySaved = true
-      let placeRef
-      let placeKey
-      if (p.place) {
-        placeRef = db.ref('finds').orderByChild('place/id').equalTo(p.place.id);
-      } else {
-        placeRef = db.ref('finds').orderByChild('place/id').equalTo(p.id);
-      }
+      const placeId = p.place ? p.place.id : p.id
+      let placeRef = db.ref('finds').orderByChild('place/id').equalTo(placeId)
       placeRef.once('value').then((snap) => {
         if (snap.val()) {
-          placeKey = Object.keys(snap.val())[0];
+          const placeKey = Object.keys(snap.val())[0];
           addToSaved(this.user, placeKey)
           db.ref('finds/' + placeKey + '/users/' + this.user.uid).set({
             uid: this.user.uid,

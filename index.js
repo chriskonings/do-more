@@ -29,7 +29,6 @@ firebase.initializeApp({
 
 app.get('/getPlacesUsers', function(req, res) {
   const {places} = req.query
-  const placesArr = []
   const promises = places.map(id => {
     return firebase.database().ref('finds')
     .orderByChild('place/id')
