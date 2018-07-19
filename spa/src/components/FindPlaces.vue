@@ -32,6 +32,7 @@
       :user="user"
       :page="page"
       @getPlaces="getPlaces"
+      @deletePlace="deletePlace"
       :loading="searching"
       :markers="markers"
       :map="map"
@@ -48,8 +49,6 @@ import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
 import Places from './Places'
-import emptyHeart from '../assets/empty-heart.svg'
-import fullHeart from '../assets/full-heart.svg'
 
 export default {
   name: 'FindPlaces',
@@ -73,10 +72,34 @@ export default {
   },
 
   methods: {
+    deletePlace(place, key) {
+      console.log(place)
+      db.ref('finds/' + key)
+        .child('users')
+        .child(this.user.uid).remove()
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+      db.ref('users/' + this.user.uid)
+        .child('saved/' + key)
+        .set(false)
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+      this.$delete(place.users, this.user.uid)
+      this.$set(this.user.saved, key, false)
+    },
     async getPlaces() {
       this.searching = true
       if (this.page === 0) this.places = []
-      this.places = await this.buildList()
+      const list = await this.buildList()
+      this.places.push(...list)
       this.placeYelpMarkers()
       if (this.places.length >= 25) this.page += 1
       this.searching = false
@@ -120,18 +143,19 @@ export default {
       }
     },
     async getUsers(places) {
-      // Map the Firebase promises into an array
       const ids = places.map(p => p.id)
       try {
-        const res = await axios.get('/getPlacesUsers', {
+        const res = await axios.get('/getPlaceUsers', {
           params: {
             places: ids
           }
         })
-        res.data.forEach((p, i) => {
-          if (p) places[i].users = p.users
+        const users = res.data
+        const placesWithUsers = places.map((place, i) => {
+          place.users = users[i]
+          return place
         });
-        return places
+        return placesWithUsers
       } catch (e) {
         console.log(e)
         return e
@@ -141,26 +165,9 @@ export default {
       const vm = this
       this.markers = []
       this.$emit('clearMarkers')
-      gm.load(async (google) => {
-        for (let i = 0; i < this.places.length; i++) {
-          const markerLabel = this.places[i].users ? String(Object.keys(this.places[i].users).length) : '0'
-          const markerIcon = this.places[i].users ? fullHeart : emptyHeart
-          var MarkerWithLabel = require('markerwithlabel')(google.maps);
-          this.markers[i] = new MarkerWithLabel({
-            position: {lat: this.places[i].coordinates.latitude, lng: this.places[i].coordinates.longitude},
-            labelContent:  markerLabel,
-            icon: markerIcon,
-            map: vm.map,
-            labelAnchor: new google.maps.Point(15.5, 42),
-            labelClass: "marker-label", // the CSS class for the label
-          });
-          this.markers[i].place = this.places[i];
-          google.maps.event.addListener(this.markers[i], 'click', function() {
-            vm.infoWindow.el.open(vm.map, this);
-            vm.infoWindow.content = vm.places[i]
-          });
-        }
-      });
+      for (let i = 0; i < this.places.length; i++) {
+        this.markers[i] = utils.newMarker(this.places[i], this.places[i].users, this.map, this.infoWindow)
+      }
       console.log('placed yelp markers')
     },
     getActivities(activities) {
@@ -168,6 +175,9 @@ export default {
     },
   },
   watch: {
+    places(p) {
+      console.log(p)
+    },
     selected(){
       this.page = 0
     },

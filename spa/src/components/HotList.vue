@@ -5,65 +5,40 @@
     </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-finds__list">
-      <li class="c-my-find" v-for="(g, i) in sortedFinds" :key="i">
-        <div class="c-my-find__cont">
-          <div
-            class="c-my-find__img-container"
-            :class="{'is-loading': loadingImgs[g.place.id]}"
-          >
-            <img
-              v-show="!loadingImgs[g.place.id]"
-              class="c-my-find__img"
-              :src="g.place.image_url"
-              @load="imageLoaded(g.place.id)"
-              alt="place-photo"/>
-          </div>
-          <div class="c-my-find__details">
-            <div class="c-my-find__name">{{g.place.name}}</div>
-            <div class="c-my-find__loc">{{g.place.city}}, {{g.place.country}}</div>
-            <template v-if="g.users">
-              <div v-for="(u, i) in g.users" :key="i">
-                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
-                </div>
-              </div>
-            </template>
-          </div>
-          <ul class="c-my-find__btns">
-            <li class="c-my-find__btn">
-              <a
-                :href="g.place.link"
-                target="_blank"
-                class="c-btn c-btn--naked">
-                Link
-              </a>
-            </li>
-            <li class="c-my-find__btn">
-              <button
-                :disabled="!user"
-                class="c-btn c-btn--naked"
-                @click.prevent="savePlace(g)">
-                Save
-              </button>
-            </li>
-          </ul>
-        </div>
-      </li>
+      <PlaceCard
+        v-for="(g, i) in sortedFinds"
+        :key="i"
+        @loaded="imageLoaded(g.place.id)"
+        @save="savePlace(g)"
+        @trash="deletePlace(g, g['.key'])"
+        :user="user"
+        :loading="loadingImgs[g.place.id]"
+        :icon="g.place.image_url"
+        :name="g.place.name"
+        :city="g.place.city"
+        :link="g.place.link"
+        :country="g.place.country"
+        :users="g.users"
+        :identifier="i"
+        :trashable="false"
+      />
     </ul>
   </div>
 </template>
 
 <script>
 import { db } from '../firebase';
+import PlaceCard from './PlaceCard';
+import axios from 'axios'
 
 /* eslint-disable */
 export default {
   name: 'HotList',
-  props: ['savePlace', 'user'],
+  props: ['savePlace', 'user', 'trash'],
   data() {
     return {
       loading: false,
       finds: [],
-      deleting: null,
       loadingImgs: {},
     };
   },
@@ -78,6 +53,28 @@ export default {
     imageLoaded(id) {
       this.$set(this.loadingImgs, id, false)
     },
+    async deletePlace(place, key) {
+      db.ref('finds/' + key)
+        .child('users')
+        .child(this.user.uid).remove()
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+      db.ref('users/' + this.user.uid)
+        .child('saved/' + key)
+        .set(false)
+        .then(() => {
+          console.log('Remove succeeded.');
+        })
+        .catch((error) => {
+          console.log('Remove failed: ', error.message);
+        });
+      this.$delete(place.users, this.user.uid)
+      this.$set(this.user.saved, key, false)
+    }
   },
   watch: {
     finds(list) {
@@ -91,18 +88,17 @@ export default {
   },
   computed: {
     sortedFinds: function() {
-      function compareUserCount(a, b) {
+      return this.finds.sort((a, b) => {
         const aUsers = a.users ? Object.keys(a.users).length : 0
         const bUsers = b.users ? Object.keys(b.users).length : 0
-        if (aUsers < bUsers) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-      return this.finds.sort(compareUserCount);
+        const value = (aUsers < bUsers) ? 1 : -1
+        return value
+      })
     }
-  }
+  },
+  components: {
+    PlaceCard
+  },
 };
 </script>
 

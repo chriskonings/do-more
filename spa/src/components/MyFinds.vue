@@ -5,61 +5,30 @@
     </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-finds__list">
-      <li class="c-my-find" v-for="(g, k) in finds" :key="k">
-        <div class="c-my-find__cont">
-          <div
-            class="c-my-find__img-container"
-            :class="{'is-loading': loadingImgs[k]}"
-          >
-            <img
-              v-show="!loadingImgs[k]"
-              class="c-my-find__img"
-              :src="g.place.image_url"
-              @load="imageLoaded(k)"
-              alt="place-photo"/>
-          </div>
-          <div class="c-my-find__details">
-            <div class="c-my-find__name">{{g.place.name}}</div>
-            <div class="c-my-find__loc">{{g.place.city}}, {{g.place.country}}</div>
-            <template v-if="g.users">
-              <div v-for="(u, i) in g.users" :key="i">
-                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
-                </div>
-              </div>
-            </template>
-          </div>
-          <ul class="c-my-find__btns">
-            <li class="c-my-find__btn">
-              <a
-                :href="g.place.link"
-                target="_blank"
-                class="c-btn c-btn--naked">
-                Link
-              </a>
-            </li>
-            <li class="c-my-find__btn">
-              <button
-                @click="deleting = k"
-                class="c-btn c-btn--naked">
-                Trash
-              </button>
-            </li>
-          </ul>
-        </div>
-        <div v-if="deleting === k" class="c-my-find__delete">
-          Are you sure you want to delete this find?
-          <div class="c-my-find__delete-btns">
-            <button @click="deletefind(k)" class="c-btn c-btn--naked">Yes</button>
-            <button @click="deleting = null" class="c-btn c-btn--naked">No</button>
-          </div>
-        </div>
-      </li>
+      <PlaceCard
+        v-for="(g, k) in finds"
+        :key="k"
+        @loaded="imageLoaded(k)"
+        @save="savePlace(g)"
+        @trash="deletePlace(k)"
+        :user="user"
+        :loading="loadingImgs[k]"
+        :icon="g.place.image_url"
+        :name="g.place.name"
+        :city="g.place.city"
+        :link="g.place.link"
+        :country="g.place.country"
+        :users="g.users"
+        :identifier="k"
+        :trashable="true"
+      />
     </ul>
   </div>
 </template>
 
 <script>
 import { db } from '../firebase';
+import PlaceCard from './PlaceCard';
 
 /* eslint-disable */
 export default {
@@ -68,9 +37,9 @@ export default {
   data() {
     return {
       loading: false,
-      finds: {},
       deleting: null,
       loadingImgs: {},
+      finds: {}
     };
   },
   async mounted() {
@@ -79,17 +48,21 @@ export default {
   methods: {
     async getfinds() {
       this.loading = true;
-      for (const key in this.user.saved) {
-        db.ref('finds/' + key).once('value').then((snap) => {
+      const keys = Object.keys(this.user.saved)
+      const array = keys.filter(key => this.user.saved[key])
+      const promises = array.map(key => {
+        return db.ref('finds/' + key).once('value').then((snap) => {
           if (snap.val()) {
-            this.$set(this.finds, key, snap.val())
+            this.finds[key] = snap.val()
             this.$set(this.loadingImgs, key, true)
           }
         });
-      }
-      this.loading = false;
+      });
+      Promise.all(promises).then(p => {
+        this.loading = false;
+      });
     },
-    deletefind(key) {
+    deletePlace(key) {
       db.ref('finds/' + key)
         .child('users')
         .child(this.user.uid).remove()
@@ -100,8 +73,8 @@ export default {
           console.log('Remove failed: ', error.message);
         });
       db.ref('users/' + this.user.uid)
-        .child('saved')
-        .child(key).remove()
+        .child('saved/' + key)
+        .set(false)
         .then(() => {
           console.log('Remove succeeded.');
         })
@@ -109,12 +82,13 @@ export default {
           console.log('Remove failed: ', error.message);
         });
       this.$delete(this.finds, key)
-      this.$delete(this.user.saved, key)
+      this.$set(this.user.saved, key, false)
     },
     imageLoaded(key) {
       this.$set(this.loadingImgs, key, false)
     },
   },
+  components: {PlaceCard}
 };
 </script>
 

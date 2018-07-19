@@ -27,7 +27,7 @@ firebase.initializeApp({
   databaseURL: 'https://do-more-ecc5c.firebaseio.com/',
 });
 
-app.get('/getPlacesUsers', function(req, res) {
+app.get('/getPlaceUsers', function(req, res) {
   const {places} = req.query
   const promises = places.map(id => {
     return firebase.database().ref('finds')
@@ -42,10 +42,25 @@ app.get('/getPlacesUsers', function(req, res) {
       }
     })
   });
-  Promise.all(promises).then((p)=>{
-    res.json(p)
+  Promise.all(promises).then( p => {
+    const users = p.map(p => p && p.users)
+    res.json(users)
   });
   return res
+})
+
+app.get('/placeKeyById', function(req, res) {
+  const {placeId} = req.query
+  firebase.database().ref('finds')
+  .orderByChild('place/id')
+  .equalTo(placeId)
+  .once('value').then(s => {
+    if (s.val()) {
+      const key = Object.keys(s.val())[0]
+      res.json(key)
+    }
+    return res
+  })
 })
 
 app.get('/getYelpResults', function(req, res) {

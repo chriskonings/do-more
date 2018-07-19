@@ -47,7 +47,10 @@
             :savePlace="savePlace"
             :user="user"
           />
-          <MyFinds v-if="user && menu === 3" :user="user"/>
+          <MyFinds
+            v-if="user && menu === 3"
+            :user="user"
+          />
         </div>
       </div>
     </main>
@@ -76,6 +79,7 @@ import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
+import utils from './utils'
 
 function getUser (user) {
   const userObj = {
@@ -98,16 +102,6 @@ function getUser (user) {
       });
     }
   });
-}
-
-function addToSaved (user, key) {
-  if (user.saved) {
-    user.saved[key] = key
-  } else {
-    user.saved = {}
-    user.saved[key] = key
-  }
-  db.ref('users/' + user.uid).child('saved/' + key).set(key)
 }
 
 function buildPlaceObj (p, user) {
@@ -179,7 +173,6 @@ export default {
       itinerary: null,
       user: null,
       userFinds: [],
-      userFindsIDs: [],
       menu: 0,
       infoWindow: {
         el: null,
@@ -219,25 +212,47 @@ export default {
         success()
       });
     },
-    async savePlace(p) {
+    savePlace(p) {
+      // add to local place users
       const placeId = p.place ? p.place.id : p.id
       let placeRef = db.ref('finds').orderByChild('place/id').equalTo(placeId)
-      placeRef.once('value').then((snap) => {
+      const userObj = {
+        uid: this.user.uid,
+        displayName: this.user.displayName,
+        photoURL: this.user.photoURL
+      }
+      placeRef.once('value').then(async (snap) => {
         if (snap.val()) {
-          const placeKey = Object.keys(snap.val())[0];
-          addToSaved(this.user, placeKey)
-          db.ref('finds/' + placeKey + '/users/' + this.user.uid).set({
-            uid: this.user.uid,
-            displayName: this.user.displayName,
-            photoURL: this.user.photoURL
-          })
+          const placeObj = snap.val()
+          const placeKey = Object.keys(placeObj)[0];
+          db.ref('finds/' + placeKey + '/users/' + this.user.uid).set(userObj)
+          this.addToSaved(placeKey, p, userObj)
+          const marker = utils.newMarker(placeObj[placeKey], p.users, this.globalMap, this.infoWindow)
+          this.globalMarkers.push(marker)
         } else {
           const placeObj = buildPlaceObj(p, this.user)
-          db.ref('finds').push(placeObj).then((snap) => {
-            addToSaved(this.user, snap.key)
+          db.ref('finds').push(placeObj).then(snap => {
+            this.addToSaved(snap.key, placeObj, userObj)
+            const marker = newMarker(p, placeObj.users, this.globalMap, this.infoWindow)
+            this.globalMarkers.push(marker)
           })
         }
       });
+    },
+    addToSaved(key, place, user) {
+      if (this.user.saved) {
+        this.$set(this.user.saved, key, true)
+      } else {
+        this.$set(this.user, saved, {})
+        this.$set(this.user.saved, key, true)
+      }
+      if (place.users) {
+        this.$set(place.users, this.user.uid, user)
+      } else {
+        this.$set(place, 'users', {})
+        this.$set(place.users, this.user.uid, user)
+      }
+      db.ref('users/' + this.user.uid).child('saved/' + key).set(true)
     },
     getPlaces(list) {
       this.itineraryList = list;

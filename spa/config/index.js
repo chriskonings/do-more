@@ -16,7 +16,11 @@ module.exports = {
         target: 'http://localhost:' + port,
         changeOrigin: true
       },
-      '/getPlacesUsers': {
+      '/getPlaceUsers': {
+        target: 'http://localhost:' + port,
+        changeOrigin: true
+      },
+      '/placeKeyById': {
         target: 'http://localhost:' + port,
         changeOrigin: true
       },

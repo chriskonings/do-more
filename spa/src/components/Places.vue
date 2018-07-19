@@ -1,50 +1,22 @@
 <template>
   <div class="c-my-finds">
     <ul class="c-my-finds__list">
-      <li
-        class="c-my-find"
+      <PlaceCard
         v-for="(p, i) in places"
         :key="i"
-        @mouseover="highlight(p, p.id, i)"
-      >
-        <div class="c-my-find__cont">
-          <div
-            class="c-my-find__img-container"
-            :class="{'is-loading': loadingImgs[p.id]}"
-          >
-            <img
-              v-show="!loadingImgs[p.id]"
-              class="c-my-find__img"
-              :src="p.image_url"
-              @load="imageLoaded(p.id)"
-              alt="place-photo"/>
-          </div>
-          <div class="c-my-find__details">
-            <div class="c-my-find__name">{{p.name}}</div>
-            <template v-if="p.users">
-              <div v-for="(u, i) in p.users" :key="i">
-                <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
-                </div>
-              </div>
-            </template>
-          </div>
-          <ul class="c-my-find__btns">
-            <li class="c-my-find__btn">
-              <a :href="p.url" target="_blank" class="c-btn c-btn--naked">
-                Link
-              </a>
-            </li>
-            <li class="c-my-find__btn">
-              <button
-                :disabled="!user"
-                class="c-btn c-btn--naked"
-                @click.prevent="savePlace(p)">
-                Save
-              </button>
-            </li>
-          </ul>
-        </div>
-      </li>
+        @hover="highlight(p, p.id, i)"
+        @loaded="imageLoaded(p.id)"
+        @save="savePlace(p)"
+        @trash="deletePlace(p, p.id)"
+        :user="user"
+        :loading="loadingImgs[p.id]"
+        :icon="p.image_url"
+        :name="p.name"
+        :link="p.url"
+        :users="p.users"
+        :identifier="i"
+        :trashable="false"
+      />
     </ul>
     <button
       v-if="page >= 1 && !loading"
@@ -58,6 +30,8 @@
 </template>
 
 <script>
+import PlaceCard from './PlaceCard'
+import axios from 'axios'
 
 /* eslint-disable */
 export default {
@@ -90,6 +64,20 @@ export default {
         });
       }
     },
+    async deletePlace(place, id) {
+      try {
+        const getKey = await axios.get('/placeKeyById', {
+          params: {
+            placeId: id
+          }
+        })
+        const key = getKey.data
+        this.$emit('deletePlace', place, key)
+      } catch (e) {
+        console.log(e)
+        return e
+      }
+    },
     loadMore() {
       this.$emit('getPlaces');
     },
@@ -107,6 +95,7 @@ export default {
       })
     }
   },
+  components: {PlaceCard}
 };
 </script>
 
