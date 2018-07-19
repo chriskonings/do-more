@@ -13,8 +13,6 @@
 <script>
 /* eslint-disable */
 
-import utils from './utils'
-
 export default {
   name: 'Map',
   props: ['emitMap', 'markers', 'infoWindow'],
@@ -72,7 +70,7 @@ export default {
           });
         }
       });
-      this.yourPin = new google.maps.Marker({icon: utils.pinSymbol('green')})
+      this.yourPin = new google.maps.Marker({icon: this.$utils.pinSymbol('green')})
     },
     getLocation () {
       if (navigator.geolocation) {
@@ -95,14 +93,14 @@ export default {
       if(this.myPosPin) this.myPosPin.setMap(null)
       this.myPosPin = new google.maps.Marker({
         position: {lat: lat, lng: lng},
-        icon: utils.pinSymbol('green'),
+        icon: this.$utils.pinSymbol('green'),
         animation: google.maps.Animation.DROP,
       });
       this.myPosPin.setMap(this.map);
     },
     whereToGo () {
       const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()])
-      const yourPlace = utils.calcPrimeLocation(markerPositions)
+      const yourPlace = this.$utils.calcPrimeLocation(markerPositions)
       if (yourPlace) {
         const panPoint = new google.maps.LatLng(yourPlace[0], yourPlace[1]);
         this.yourPin.setPosition({lat: yourPlace[0], lng: yourPlace[1]});

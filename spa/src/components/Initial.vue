@@ -46,6 +46,7 @@
             v-if="menu === 2"
             :savePlace="savePlace"
             :user="user"
+            :map="globalMap"
           />
           <MyFinds
             v-if="user && menu === 3"
@@ -79,7 +80,6 @@ import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
-import utils from './utils'
 
 function getUser (user) {
   const userObj = {
@@ -227,14 +227,17 @@ export default {
           const placeKey = Object.keys(placeObj)[0];
           db.ref('finds/' + placeKey + '/users/' + this.user.uid).set(userObj)
           this.addToSaved(placeKey, p, userObj)
-          const marker = utils.newMarker(placeObj[placeKey], p.users, this.globalMap, this.infoWindow)
-          this.globalMarkers.push(marker)
+          const m = this.$utils.newMarker(placeObj[placeKey], p.users, this.globalMap, this.infoWindow)
+          this.globalMarkers[p.markerIndex].setMap(null)
+          console.log(this.globalMarkers[p.markerIndex])
+          this.globalMarkers.splice(p.markerIndex, 1, m);
         } else {
           const placeObj = buildPlaceObj(p, this.user)
           db.ref('finds').push(placeObj).then(snap => {
             this.addToSaved(snap.key, placeObj, userObj)
-            const marker = newMarker(p, placeObj.users, this.globalMap, this.infoWindow)
-            this.globalMarkers.push(marker)
+            const m = this.$utils.newMarker(p, placeObj.users, this.globalMap, this.infoWindow)
+            this.globalMarkers[p.markerIndex].setMap(null)
+            this.globalMarkers.splice(p.markerIndex, 1, m);
           })
         }
       });

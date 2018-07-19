@@ -11,6 +11,7 @@
         @loaded="imageLoaded(g.place.id)"
         @save="savePlace(g)"
         @trash="deletePlace(g, g['.key'])"
+        @panToPlace="panToPlace(g.place)"
         :user="user"
         :loading="loadingImgs[g.place.id]"
         :icon="g.place.image_url"
@@ -34,7 +35,7 @@ import axios from 'axios'
 /* eslint-disable */
 export default {
   name: 'HotList',
-  props: ['savePlace', 'user', 'trash'],
+  props: ['savePlace', 'user', 'trash', 'map'],
   data() {
     return {
       loading: false,
@@ -74,6 +75,10 @@ export default {
         });
       this.$delete(place.users, this.user.uid)
       this.$set(this.user.saved, key, false)
+    },
+    panToPlace(p) {
+      var latLng = new google.maps.LatLng(p.pos.lat, p.pos.lng);
+      this.map.panTo(latLng);
     }
   },
   watch: {

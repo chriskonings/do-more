@@ -1,17 +1,17 @@
 /* eslint-disable */
-import fullHeart from '../assets/full-heart.svg'
-import emptyHeart from '../assets/empty-heart.svg'
+import fullHeart from './assets/full-heart.svg'
+import emptyHeart from './assets/empty-heart.svg'
 
 const utils = {
   newMarker(p, users, map, iw) {
     let marker
+    const userCount = users ? Object.keys(users).length : 0
     const place = p.place ? p.place : p
     const lat = p.place ? p.place.pos.lat : p.coordinates.latitude
     const lng = p.place ? p.place.pos.lng : p.coordinates.longitude
-    const markerLabel = users ? String(Object.keys(users).length) : '0'
-    const markerIcon = users ? fullHeart : emptyHeart
-    const zIndex = users ? Object.keys(users).length * 10 : 1
-    console.log(zIndex)
+    const markerLabel = userCount ? String(userCount) : '0'
+    const markerIcon = (userCount >= 1) ? fullHeart : emptyHeart
+    const zIndex = (userCount >= 1) ? userCount * 10 : (userCount + 1)
     gm.load(async (google) => {
       var MarkerWithLabel = require('markerwithlabel')(google.maps);
       marker = new MarkerWithLabel({

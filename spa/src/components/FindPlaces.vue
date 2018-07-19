@@ -44,7 +44,6 @@
 <script>
 /* eslint-disable */
 import { db } from '../firebase';
-import utils from './utils'
 import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
@@ -73,7 +72,6 @@ export default {
 
   methods: {
     deletePlace(place, key) {
-      console.log(place)
       db.ref('finds/' + key)
         .child('users')
         .child(this.user.uid).remove()
@@ -94,6 +92,9 @@ export default {
         });
       this.$delete(place.users, this.user.uid)
       this.$set(this.user.saved, key, false)
+      const m = this.$utils.newMarker(place, place.users, this.map, this.infoWindow)
+      this.markers[place.markerIndex].setMap(null)
+      this.markers.splice(place.markerIndex, 1, m);
     },
     async getPlaces() {
       this.searching = true
@@ -166,18 +167,15 @@ export default {
       this.markers = []
       this.$emit('clearMarkers')
       for (let i = 0; i < this.places.length; i++) {
-        this.markers[i] = utils.newMarker(this.places[i], this.places[i].users, this.map, this.infoWindow)
+        this.markers[i] = this.$utils.newMarker(this.places[i], this.places[i].users, this.map, this.infoWindow)
+        this.places[i].markerIndex = i
       }
-      console.log('placed yelp markers')
     },
     getActivities(activities) {
       this.selected = activities;
     },
   },
   watch: {
-    places(p) {
-      console.log(p)
-    },
     selected(){
       this.page = 0
     },

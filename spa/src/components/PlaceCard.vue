@@ -24,6 +24,13 @@
       </div>
       <ul class="c-my-find__btns">
         <li class="c-my-find__btn">
+          <button
+            class="c-btn c-btn--naked"
+            @click.prevent="panToPlace">
+            Go to
+          </button>
+        </li>
+        <li class="c-my-find__btn">
           <a
             :href="link"
             target="_blank"
@@ -86,6 +93,9 @@ export default {
     },
     mouseover() {
       this.$emit('hover')
+    },
+    panToPlace() {
+      this.$emit('panToPlace')
     },
   },
   watch: { },
