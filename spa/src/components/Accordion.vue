@@ -19,21 +19,16 @@
 </template>
 
 <script>
-/* eslint-disable */
 export default {
   name: 'Accordion',
   props: ['label'],
-  data () {
+  data() {
     return {
-      isOpen: false
-    }
+      isOpen: false,
+    };
   },
   methods: {
 
   },
 };
 </script>
-
-
-
-

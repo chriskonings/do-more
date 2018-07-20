@@ -7,39 +7,39 @@
 </template>
 
 <script>
-/* eslint-disable */
 export default {
   name: 'LocationSearch',
-  props: ['map', 'places'],
+  props: ['map', 'places', 'google'],
   data() {
     return {
-      invalidPlace: false
-    }
+      invalidPlace: false,
+    };
   },
   mounted() {
     this.initLocationSearch();
   },
   methods: {
     initLocationSearch() {
+      const google = this.google;
       const input = this.$refs.loc;
-      var autocomplete = new google.maps.places.Autocomplete(input);
+      const autocomplete = new google.maps.places.Autocomplete(input);
       autocomplete.addListener('place_changed', () => {
-        var place = autocomplete.getPlace();
+        const place = autocomplete.getPlace();
         if (place.geometry) {
           if (place.types.includes('establishment')) {
-            console.log(place)
+            console.log(place);
           }
-          this.invalidPlace = false
-          var panPoint = new google.maps.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
-          this.map.panTo(panPoint)
+          this.invalidPlace = false;
+          const panPoint = new google.maps.LatLng(
+            place.geometry.location.lat(),
+            place.geometry.location.lng(),
+          );
+          this.map.panTo(panPoint);
         } else {
-          this.invalidPlace = true
+          this.invalidPlace = true;
         }
       });
-  }
+    },
   },
 };
 </script>
-
-
-

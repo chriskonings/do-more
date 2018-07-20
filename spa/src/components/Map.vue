@@ -11,46 +11,49 @@
 </template>
 
 <script>
-/* eslint-disable */
 
 export default {
   name: 'Map',
-  props: ['emitMap', 'markers', 'infoWindow'],
+  props: ['emitMap', 'markers', 'infoWindow', 'google'],
   data() {
     return {
       position: { lat: 0, lng: 0 },
       map: null,
       currentPlace: null,
       errors: [],
-      myPosPin: null
+      myPosPin: null,
     };
   },
   mounted() {
-    this.initMap()
+    this.initMap();
   },
   methods: {
     initMap() {
-      var myStyles =[{
-        featureType: "poi",
-        elementType: "labels",
+      const google = this.google;
+      const myStyles = [{
+        featureType: 'poi',
+        elementType: 'labels',
         stylers: [
-          {visibility: "off"},
+          { visibility: 'off' },
         ],
       }];
+      const icon = this.$utils.pinSymbol('green');
       this.map = new google.maps.Map(this.$refs.map, {
         zoom: 15,
         center: this.position,
         mapTypeControl: false,
         styles: myStyles,
-      })
-      this.getLocation()
+      });
+      this.getLocation();
       const service = new google.maps.places.PlacesService(this.map);
       google.maps.event.addListener(this.map, 'click', (event) => {
         if (event.placeId) {
           event.stop();
-          service.getDetails({placeId: event.placeId}, (place, status) => {
-            var marker = new google.maps.Marker({
-              position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()},
+          service.getDetails({ placeId: event.placeId }, (place, status) => {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            const marker = new google.maps.Marker({
+              position: { lat, lng },
               map: this.map,
               title: place.name,
               visible: false,
@@ -60,52 +63,55 @@ export default {
               this.infoWindow.content = {
                 name: place.name,
                 phone: place.formatted_phone_number,
-                place: place,
+                place,
                 url: place.url,
                 image_url: typeof place.photos !== 'undefined'
-                    ? place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-                    : ''
-              }
+                  ? place.photos[0].getUrl({ maxWidth: 100, maxHeight: 100 })
+                  : '',
+              };
             }
           });
         }
       });
-      this.yourPin = new google.maps.Marker({icon: this.$utils.pinSymbol('green')})
+      this.yourPin = new google.maps.Marker({ icon });
     },
-    getLocation () {
+    getLocation() {
+      const google = this.google;
       if (navigator.geolocation) {
         const options = {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 0
+          maximumAge: 0,
         };
         navigator.geolocation.getCurrentPosition((pos) => {
           const crd = pos.coords;
           const panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
-          this.map.panTo(panPoint)
-          this.placeMyPosPin(crd.latitude, crd.longitude)
+          this.map.panTo(panPoint);
+          this.placeMyPosPin(crd.latitude, crd.longitude);
         }, (err) => {
           console.warn(`ERROR(${err.code}): ${err.message}`);
         }, options);
       }
     },
     async placeMyPosPin(lat, lng) {
-      if(this.myPosPin) this.myPosPin.setMap(null)
+      const google = this.google;
+      if (this.myPosPin) this.myPosPin.setMap(null);
       this.myPosPin = new google.maps.Marker({
-        position: {lat: lat, lng: lng},
+        position: { lat, lng },
         icon: this.$utils.pinSymbol('green'),
         animation: google.maps.Animation.DROP,
       });
       this.myPosPin.setMap(this.map);
     },
-    whereToGo () {
-      const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()])
-      const yourPlace = this.$utils.calcPrimeLocation(markerPositions)
+    whereToGo() {
+      const google = this.google;
+      const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()]);
+      const yourPlace = this.$utils.calcPrimeLocation(markerPositions);
       if (yourPlace) {
         const panPoint = new google.maps.LatLng(yourPlace[0], yourPlace[1]);
-        this.yourPin.setPosition({lat: yourPlace[0], lng: yourPlace[1]});
+        this.yourPin.setPosition({ lat: yourPlace[0], lng: yourPlace[1] });
         this.yourPin.setMap(this.map);
-        this.map.panTo(panPoint)
+        this.map.panTo(panPoint);
       } else {
         this.yourPin.setMap(null);
       }
@@ -113,11 +119,8 @@ export default {
   },
   watch: {
     map() {
-      this.$emit('emitMap', this.map)
-    }
-  }
+      this.$emit('emitMap', this.map);
+    },
+  },
 };
 </script>
-
-
-

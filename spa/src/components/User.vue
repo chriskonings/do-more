@@ -39,14 +39,13 @@
 <script>
 import firebase from 'firebase/app';
 
-/* eslint-disable */
 export default {
   name: 'User',
   props: ['user'],
   data() {
     return {
       message: '',
-    }
+    };
   },
   methods: {
     userSettings() {
@@ -57,15 +56,15 @@ export default {
       firebase.auth().signInWithRedirect(provider);
     },
     signOut() {
-      firebase.auth().signOut().then(function() {
-        console.log('signed out')
-      }).catch(function(error) {
-        console.log(error)
+      firebase.auth().signOut().then(() => {
+        console.log('signed out');
+      }).catch((error) => {
+        console.log(error);
       });
     },
     showUserMenu() {
-      this.$emit('showUserMenu')
-    }
+      this.$emit('showUserMenu');
+    },
     // update() {
     //   const vm = this
     //   this.user.updateProfile({

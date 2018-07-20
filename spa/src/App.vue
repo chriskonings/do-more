@@ -1,6 +1,6 @@
 <template>
   <div class="o-app" id="app">
-    <router-view :googleMaps="googleMaps"/>
+    <router-view :google="google"/>
   </div>
 </template>
 
@@ -12,12 +12,12 @@ export default {
   name: 'App',
   data() {
     return {
-      googleMaps: null,
+      google: null,
     };
   },
   created() {
     gm.load((google) => { // eslint-disable-line no-undef
-      this.googleMaps = google.maps;
+      this.google = google;
     });
   },
 };

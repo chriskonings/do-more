@@ -17,7 +17,10 @@
         <div v-if="city || country" class="c-my-find__loc">{{city}}, {{country}}</div>
         <template v-if="users">
           <div v-for="(u, i) in users" :key="i">
-            <div :title="u.displayName" class="c-my-find__user-icon" :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
+            <div
+              class="c-my-find__user-icon"
+              :title="u.displayName"
+              :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
             </div>
           </div>
         </template>
@@ -59,9 +62,7 @@
 </template>
 
 <script>
-import axios from 'axios'
 
-/* eslint-disable */
 export default {
   name: 'PlaceCard',
   props: [
@@ -74,38 +75,32 @@ export default {
     'country',
     'users',
     'identifier',
-    'trashable',
   ],
   data() {
-    return {
-      trashing: false
-    };
+    return {};
   },
   methods: {
     loaded() {
-      this.$emit('loaded')
+      this.$emit('loaded');
     },
     save() {
-      this.$emit('save')
+      this.$emit('save');
     },
     async trash() {
-      this.$emit('trash')
+      this.$emit('trash');
     },
     mouseover() {
-      this.$emit('hover')
+      this.$emit('hover');
     },
     panToPlace() {
-      this.$emit('panToPlace')
+      this.$emit('panToPlace');
     },
   },
   watch: { },
   computed: {
     isSaved() {
-      return this.users && this.users[this.user.uid]
-    }
-  }
+      return this.users && this.users[this.user.uid];
+    },
+  },
 };
 </script>
-
-
-

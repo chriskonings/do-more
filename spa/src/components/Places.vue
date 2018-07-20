@@ -15,7 +15,6 @@
         :link="p.url"
         :users="p.users"
         :identifier="i"
-        :trashable="false"
       />
     </ul>
     <button
@@ -30,10 +29,9 @@
 </template>
 
 <script>
-import PlaceCard from './PlaceCard'
-import axios from 'axios'
+import axios from 'axios';
+import PlaceCard from './PlaceCard';
 
-/* eslint-disable */
 export default {
   name: 'Places',
   props: [
@@ -55,11 +53,11 @@ export default {
   methods: {
     highlight(p, id, idx) {
       if (this.currentlyHighlighted !== idx) {
-        this.currentlyHighlighted = idx
-        this.markers.forEach(m => {
+        this.currentlyHighlighted = idx;
+        this.markers.forEach((m) => {
           if (m.place.id === id) {
             this.infoWindow.el.open(this.map, m);
-            this.infoWindow.content = p
+            this.infoWindow.content = p;
           }
         });
       }
@@ -68,36 +66,35 @@ export default {
       try {
         const getKey = await axios.get('/placeKeyById', {
           params: {
-            placeId: id
-          }
-        })
-        const key = getKey.data
-        this.$emit('deletePlace', place, key)
+            placeId: id,
+          },
+        });
+        const key = getKey.data;
+        this.$emit('deletePlace', place, key);
+        return key;
       } catch (e) {
-        console.log(e)
-        return e
+        console.log(e);
+        return e;
       }
     },
     loadMore() {
       this.$emit('getPlaces');
     },
     imageLoaded(id) {
-      this.$set(this.loadingImgs, id, false)
+      this.$set(this.loadingImgs, id, false);
     },
   },
   watch: {
     places(list) {
-      const keys = Object.keys(this.loadingImgs)
+      const keys = Object.keys(this.loadingImgs);
+      // eslint-disable-next-line
       list.map((p) => {
         if (!keys.includes(p.id)) {
-          this.$set(this.loadingImgs, p.id, true)
+          this.$set(this.loadingImgs, p.id, true);
         }
-      })
-    }
+      });
+    },
   },
-  components: {PlaceCard}
+  components: { PlaceCard },
 };
 </script>
-
-
-

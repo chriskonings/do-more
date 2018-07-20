@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import firebase from 'firebase';
 import 'firebase/auth';
 
@@ -12,4 +10,5 @@ const firebaseApp = firebase.initializeApp({
   messagingSenderId: '669577878898',
 });
 
+// eslint-disable-next-line
 export const db = firebaseApp.database();

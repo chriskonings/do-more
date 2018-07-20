@@ -31,6 +31,7 @@
             class="c-form__item"
             v-show="menu === 0"
             :map="globalMap"
+            :google="google"
           />
           <FindPlaces
             v-show="menu === 0"
@@ -44,6 +45,7 @@
           />
           <HotList
             v-if="menu === 2"
+            @panToPlace="panToPlace"
             :savePlace="savePlace"
             :user="user"
             :map="globalMap"
@@ -55,11 +57,12 @@
         </div>
       </div>
     </main>
-    <aside v-if="googleMaps" class="o-aside">
+    <aside v-if="google" class="o-aside">
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
         :infoWindow="infoWindow"
+        :google="google"
       />
     </aside>
     <InfoWindow
@@ -81,41 +84,40 @@ import InfoWindow from './InfoWindow';
 import User from './User';
 import { db } from '../firebase';
 
-function getUser (user) {
+function getUser(user) {
   const userObj = {
     uid: user.uid,
     displayName: user.displayName,
     photoURL: user.photoURL,
-  }
+  };
   // check if user exists in user DB, if it does return it
   // else set the user in the DB and return
-  return db.ref('users/' + user.uid).once('value').then((snap) => {
+  return db.ref(`users/${user.uid}`).once('value').then((snap) => {
     if (snap.val()) {
-      return snap.val()
-    } else {
-      db.ref('users/' + user.uid).set(userObj, (err) => {
-        if (err) {
-          console.log(err)
-        } else {
-          return userObj
-        }
-      });
+      return snap.val();
     }
+    return db.ref(`users/${user.uid}`).set(userObj, (err) => {
+      if (err) {
+        console.log(err);
+        return err;
+      }
+      return userObj;
+    });
   });
 }
 
-function buildPlaceObj (p, user) {
-  let newPlace = {}
+function buildPlaceObj(p, user) {
+  let newPlace = {};
   if (p.place) {
-    let city = null
-    let country = null
-    for (var addr of p.place.address_components) {
+    let city = null;
+    let country = null;
+    p.place.address_components.forEach((addr) => {
       if (addr.types.includes('locality')) {
         city = addr.short_name;
       } else if (addr.types.includes('country')) {
         country = addr.short_name;
       }
-    }
+    });
     newPlace = {
       users: {
         [user.uid]: {
@@ -127,17 +129,17 @@ function buildPlaceObj (p, user) {
       place: {
         id: p.place.id,
         name: p.place.name,
-        city: city,
-        country: country,
+        city,
+        country,
         pos: {
           lat: p.place.geometry.location.lat(),
           lng: p.place.geometry.location.lng(),
         },
         image_url: typeof p.place.photos !== 'undefined'
-        ? p.place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
-        : '',
+          ? p.place.photos[0].getUrl({ maxWidth: 100, maxHeight: 100 })
+          : '',
         link: p.url,
-      }
+      },
     };
   } else {
     newPlace = {
@@ -162,31 +164,27 @@ function buildPlaceObj (p, user) {
       },
     };
   }
-  return newPlace
+  return newPlace;
 }
 
 export default {
   name: 'Initial',
-  props: ['googleMaps'],
+  props: ['google'],
   data() {
     return {
-      itinerary: null,
       user: null,
-      userFinds: [],
       menu: 0,
       infoWindow: {
         el: null,
         content: null,
       },
       globalMap: null,
-      selectedActiv: [],
       globalMarkers: [],
-      showPlaces: false
     };
   },
   async created() {
-    firebase.auth().onAuthStateChanged(user => {
-      getUser(user).then(userObj => {this.user = userObj});
+    firebase.auth().onAuthStateChanged((user) => {
+      getUser(user).then((userObj) => { this.user = userObj; });
     });
     gm.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
@@ -195,82 +193,87 @@ export default {
     });
   },
   methods: {
+    async clearMarkers() {
+      // To do - only remove markers not found in list of places
+      return new Promise((success) => {
+        for (let i = 0; i < this.globalMarkers.length; i += 1) {
+          this.globalMarkers[i].setMap(null);
+        }
+        this.globalMarkers = [];
+        success();
+      });
+    },
+    savePlace(p) {
+      // add to local place users
+      const placeId = p.place ? p.place.id : p.id;
+      const placeRef = db.ref('finds').orderByChild('place/id').equalTo(placeId);
+      const userObj = {
+        uid: this.user.uid,
+        displayName: this.user.displayName,
+        photoURL: this.user.photoURL,
+      };
+      placeRef.once('value').then(async (snap) => {
+        if (snap.val()) {
+          const placeObj = snap.val();
+          const placeKey = Object.keys(placeObj)[0];
+          db.ref(`finds/${placeKey}/users/${this.user.uid}`).set(userObj);
+          this.addToSaved(placeKey, p, userObj);
+          const m = this.$utils.newMarker(
+            placeObj[placeKey],
+            p.users,
+            this.globalMap,
+            this.infoWindow,
+          );
+          this.globalMarkers[p.markerIndex].setMap(null);
+          this.globalMarkers.splice(p.markerIndex, 1, m);
+        } else {
+          const placeObj = buildPlaceObj(p, this.user);
+          db.ref('finds').push(placeObj).then((pushed) => {
+            this.addToSaved(pushed.key, placeObj, userObj);
+            const m = this.$utils.newMarker(p, placeObj.users, this.globalMap, this.infoWindow);
+            this.globalMarkers[p.markerIndex].setMap(null);
+            this.globalMarkers.splice(p.markerIndex, 1, m);
+          });
+        }
+      });
+    },
+    addToSaved(key, place, user) {
+      if (this.user.saved) {
+        this.$set(this.user.saved, key, true);
+      } else {
+        this.$set(this.user, 'saved', {});
+        this.$set(this.user.saved, key, true);
+      }
+      if (place.users) {
+        this.$set(place.users, this.user.uid, user);
+      } else {
+        this.$set(place, 'users', {});
+        this.$set(place.users, this.user.uid, user);
+      }
+      db.ref(`users/${this.user.uid}`).child(`saved/${key}`).set(true);
+    },
+    panToPlace(p) {
+      const google = this.google;
+      const latLng = new google.maps.LatLng(p.place.pos.lat, p.place.pos.lng);
+      const m = this.$utils.newMarker(p, p.users, this.globalMap, this.infoWindow);
+      this.globalMarkers.push(m);
+      this.globalMap.panTo(latLng);
+      this.infoWindow.el.open(this.globalMap, m);
+      this.infoWindow.content = p.place;
+    },
     updateMap(map) {
       this.globalMap = map;
     },
     updateMarkers(m) {
       this.globalMarkers = m;
     },
-    async clearMarkers() {
-      // To do - only remove markers not found in list of places
-      const vm = this
-      return new Promise((success, reject) => {
-        for (let i = 0; i < vm.globalMarkers.length; i++) {
-          vm.globalMarkers[i].setMap(null);
-        }
-        vm.globalMarkers = [];
-        success()
-      });
-    },
-    savePlace(p) {
-      // add to local place users
-      const placeId = p.place ? p.place.id : p.id
-      let placeRef = db.ref('finds').orderByChild('place/id').equalTo(placeId)
-      const userObj = {
-        uid: this.user.uid,
-        displayName: this.user.displayName,
-        photoURL: this.user.photoURL
-      }
-      placeRef.once('value').then(async (snap) => {
-        if (snap.val()) {
-          const placeObj = snap.val()
-          const placeKey = Object.keys(placeObj)[0];
-          db.ref('finds/' + placeKey + '/users/' + this.user.uid).set(userObj)
-          this.addToSaved(placeKey, p, userObj)
-          const m = this.$utils.newMarker(placeObj[placeKey], p.users, this.globalMap, this.infoWindow)
-          this.globalMarkers[p.markerIndex].setMap(null)
-          console.log(this.globalMarkers[p.markerIndex])
-          this.globalMarkers.splice(p.markerIndex, 1, m);
-        } else {
-          const placeObj = buildPlaceObj(p, this.user)
-          db.ref('finds').push(placeObj).then(snap => {
-            this.addToSaved(snap.key, placeObj, userObj)
-            const m = this.$utils.newMarker(p, placeObj.users, this.globalMap, this.infoWindow)
-            this.globalMarkers[p.markerIndex].setMap(null)
-            this.globalMarkers.splice(p.markerIndex, 1, m);
-          })
-        }
-      });
-    },
-    addToSaved(key, place, user) {
-      if (this.user.saved) {
-        this.$set(this.user.saved, key, true)
-      } else {
-        this.$set(this.user, saved, {})
-        this.$set(this.user.saved, key, true)
-      }
-      if (place.users) {
-        this.$set(place.users, this.user.uid, user)
-      } else {
-        this.$set(place, 'users', {})
-        this.$set(place.users, this.user.uid, user)
-      }
-      db.ref('users/' + this.user.uid).child('saved/' + key).set(true)
-    },
-    getPlaces(list) {
-      this.itineraryList = list;
-      this.showPlaces = true;
-    },
-    getItineraries () {
-      this.showPlaces = false;
-    },
-    panMap (google) {
-      const bounds = new google.maps.LatLngBounds();
-      for (var i = 0; i < this.globalMarkers.length; i++) {
-        bounds.extend(this.globalMarkers[i].getPosition());
-      }
-      this.globalMap.fitBounds(bounds);
-    },
+    // panMap (google) {
+    //   const bounds = new google.maps.LatLngBounds();
+    //   for (var i = 0; i < this.globalMarkers.length; i++) {
+    //     bounds.extend(this.globalMarkers[i].getPosition());
+    //   }
+    //   this.globalMap.fitBounds(bounds);
+    // },
   },
   computed: {
     radius() {
@@ -279,10 +282,10 @@ export default {
       const center = this.globalMap.getCenter();
       if (bounds && center) {
         const ne = bounds.getNorthEast();
-        radius = this.googleMaps.geometry.spherical.computeDistanceBetween(center, ne);
+        radius = this.google.maps.geometry.spherical.computeDistanceBetween(center, ne);
       }
       return Math.floor(radius);
-    }
+    },
   },
   components: {
     LocationSearch,
