@@ -37,22 +37,32 @@
             v-show="menu === 0"
             @emitMarkers="updateMarkers"
             @clearMarkers="clearMarkers"
+            @createMarker="createMarker"
             :user="user"
             :map="globalMap"
             :radius="radius"
             :infoWindow="infoWindow"
             :savePlace="savePlace"
+            :markers="globalMarkers"
           />
           <HotList
             v-if="menu === 2"
             @panToPlace="panToPlace"
-            :savePlace="savePlace"
+            @savePlace="savePlace"
             :user="user"
             :map="globalMap"
+            :infoWindow="infoWindow"
+            :markers="globalMarkers"
+            @createMarker="createMarker"
           />
           <MyFinds
             v-if="user && menu === 3"
+            @panToPlace="panToPlace"
+            @createMarker="createMarker"
+            :map="globalMap"
             :user="user"
+            :infoWindow="infoWindow"
+            :markers="globalMarkers"
           />
         </div>
       </div>
@@ -193,6 +203,9 @@ export default {
     });
   },
   methods: {
+    createMarker(marker) {
+      this.globalMarkers.push(marker);
+    },
     async clearMarkers() {
       // To do - only remove markers not found in list of places
       return new Promise((success) => {
@@ -203,9 +216,9 @@ export default {
         success();
       });
     },
-    savePlace(p) {
+    savePlace(place) {
       // add to local place users
-      const placeId = p.place ? p.place.id : p.id;
+      const placeId = place.place ? place.place.id : place.id;
       const placeRef = db.ref('finds').orderByChild('place/id').equalTo(placeId);
       const userObj = {
         uid: this.user.uid,
@@ -217,22 +230,28 @@ export default {
           const placeObj = snap.val();
           const placeKey = Object.keys(placeObj)[0];
           db.ref(`finds/${placeKey}/users/${this.user.uid}`).set(userObj);
-          this.addToSaved(placeKey, p, userObj);
+          this.addToSaved(placeKey, place, userObj);
+          // move marker create to place savePlace is called?
           const m = this.$utils.newMarker(
             placeObj[placeKey],
-            p.users,
+            place.users,
             this.globalMap,
             this.infoWindow,
+            this.globalMarkers
           );
-          this.globalMarkers[p.markerIndex].setMap(null);
-          this.globalMarkers.splice(p.markerIndex, 1, m);
+          this.createMarker(m)
         } else {
-          const placeObj = buildPlaceObj(p, this.user);
+          const placeObj = buildPlaceObj(place, this.user);
           db.ref('finds').push(placeObj).then((pushed) => {
             this.addToSaved(pushed.key, placeObj, userObj);
-            const m = this.$utils.newMarker(p, placeObj.users, this.globalMap, this.infoWindow);
-            this.globalMarkers[p.markerIndex].setMap(null);
-            this.globalMarkers.splice(p.markerIndex, 1, m);
+            const m = this.$utils.newMarker(
+              place,
+              placeObj.users,
+              this.globalMap,
+              this.infoWindow,
+              this.globalMarkers
+            );
+            this.createMarker(m)
           });
         }
       });
@@ -255,8 +274,14 @@ export default {
     panToPlace(p) {
       const google = this.google;
       const latLng = new google.maps.LatLng(p.place.pos.lat, p.place.pos.lng);
-      const m = this.$utils.newMarker(p, p.users, this.globalMap, this.infoWindow);
-      this.globalMarkers.push(m);
+      const m = this.$utils.newMarker(
+        p,
+        p.users,
+        this.globalMap,
+        this.infoWindow,
+        this.globalMarkers
+      );
+      this.createMarker(m)
       this.globalMap.panTo(latLng);
       this.infoWindow.el.open(this.globalMap, m);
       this.infoWindow.content = p.place;

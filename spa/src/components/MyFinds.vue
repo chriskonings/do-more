@@ -9,8 +9,8 @@
         v-for="(g, k) in finds"
         :key="k"
         @loaded="imageLoaded(k)"
-        @save="savePlace(g)"
-        @trash="deletePlace(k)"
+        @trash="deletePlace(g, k)"
+        @panToPlace="panToPlace(g)"
         :user="user"
         :loading="loadingImgs[k]"
         :icon="g.place.image_url"
@@ -31,7 +31,7 @@ import PlaceCard from './PlaceCard';
 
 export default {
   name: 'Myfinds',
-  props: ['user'],
+  props: ['user', 'markers', 'map', 'infoWindow'],
   data() {
     return {
       loading: false,
@@ -60,7 +60,7 @@ export default {
         this.loading = false;
       });
     },
-    deletePlace(key) {
+    deletePlace(place, key) {
       db.ref(`finds/${key}`)
         .child('users')
         .child(this.user.uid).remove()
@@ -79,11 +79,23 @@ export default {
         .catch((error) => {
           console.log('Remove failed: ', error.message);
         });
-      this.$delete(this.finds, key);
+      this.$delete(place.users, this.user.uid);
       this.$set(this.user.saved, key, false);
+      const m = this.$utils.newMarker(
+        place,
+        place.users,
+        this.map,
+        this.infoWindow,
+        this.markers
+      )
+      this.$emit('createMarker', m)
+      this.$delete(this.finds, key);
     },
     imageLoaded(key) {
       this.$set(this.loadingImgs, key, false);
+    },
+    panToPlace(p) {
+      this.$emit('panToPlace', p);
     },
   },
   components: { PlaceCard },

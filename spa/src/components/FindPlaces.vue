@@ -57,12 +57,12 @@ export default {
     'map',
     'savePlace',
     'user',
+    'markers'
   ],
   data() {
     return {
       page: 0,
       places: [],
-      markers: [],
       selected: [],
       searching: false,
       places: null,
@@ -92,9 +92,14 @@ export default {
         });
       this.$delete(place.users, this.user.uid)
       this.$set(this.user.saved, key, false)
-      const m = this.$utils.newMarker(place, place.users, this.map, this.infoWindow)
-      this.markers[place.markerIndex].setMap(null)
-      this.markers.splice(place.markerIndex, 1, m);
+      const m = this.$utils.newMarker(
+        place,
+        place.users,
+        this.map,
+        this.infoWindow,
+        this.markers
+      )
+      this.$emit('createMarker', m)
     },
     async getPlaces() {
       this.searching = true
@@ -164,11 +169,16 @@ export default {
     },
     async placeYelpMarkers() {
       const vm = this
-      this.markers = []
       this.$emit('clearMarkers')
       for (let i = 0; i < this.places.length; i++) {
-        this.markers[i] = this.$utils.newMarker(this.places[i], this.places[i].users, this.map, this.infoWindow)
-        this.places[i].markerIndex = i
+        const m = this.$utils.newMarker(
+          this.places[i],
+          this.places[i].users,
+          this.map,
+          this.infoWindow,
+          this.markers
+        )
+        this.$emit('createMarker', m)
       }
     },
     getActivities(activities) {
@@ -178,9 +188,6 @@ export default {
   watch: {
     selected(){
       this.page = 0
-    },
-    markers(){
-      this.$emit('emitMarkers', this.markers)
     },
   },
   components: {Accordion, ActivitySelect, Places}

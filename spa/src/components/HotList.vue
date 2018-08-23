@@ -32,7 +32,7 @@ import PlaceCard from './PlaceCard';
 
 export default {
   name: 'HotList',
-  props: ['savePlace', 'user', 'trash', 'map'],
+  props: ['user', 'map', 'markers', 'infoWindow'],
   data() {
     return {
       loading: false,
@@ -44,6 +44,9 @@ export default {
     await this.getfinds();
   },
   methods: {
+    async savePlace(p) {
+      this.$emit('savePlace', p);
+    },
     async getfinds() {
       this.loading = true;
       this.$bindAsArray('finds', db.ref('finds'), null, () => { this.loading = false; });
@@ -72,6 +75,14 @@ export default {
         });
       this.$delete(place.users, this.user.uid);
       this.$set(this.user.saved, key, false);
+      const m = this.$utils.newMarker(
+        place,
+        place.users,
+        this.map,
+        this.infoWindow,
+        this.markers
+      )
+      this.$emit('createMarker', m)
     },
     panToPlace(p) {
       this.$emit('panToPlace', p);

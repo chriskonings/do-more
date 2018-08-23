@@ -6,6 +6,8 @@
   display: flex;
   flex-flow: column;
   flex: 1;
-  max-width: 35rem;
   background: #EFEFEF;
+  @media  screen and (min-width: 750px) {
+    max-width: 35rem;
+  }
 }

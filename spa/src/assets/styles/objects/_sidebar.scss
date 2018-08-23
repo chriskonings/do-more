@@ -3,7 +3,12 @@
  */
 
 .o-aside {
-  flex: 1;
+  display: none;
+  flex: 0;
   background-color: #efefef;
   height: 100%;
+  @media  screen and (min-width: 750px) {
+    display: initial;
+    flex: 1;
+  }
 }
