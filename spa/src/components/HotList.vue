@@ -80,9 +80,9 @@ export default {
         place.users,
         this.map,
         this.infoWindow,
-        this.markers
-      )
-      this.$emit('createMarker', m)
+        this.markers,
+      );
+      this.$emit('createMarker', m);
     },
     panToPlace(p) {
       this.$emit('panToPlace', p);

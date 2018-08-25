@@ -86,9 +86,9 @@ export default {
         place.users,
         this.map,
         this.infoWindow,
-        this.markers
-      )
-      this.$emit('createMarker', m)
+        this.markers,
+      );
+      this.$emit('createMarker', m);
       this.$delete(this.finds, key);
     },
     imageLoaded(key) {

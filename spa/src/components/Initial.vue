@@ -237,9 +237,9 @@ export default {
             place.users,
             this.globalMap,
             this.infoWindow,
-            this.globalMarkers
+            this.globalMarkers,
           );
-          this.createMarker(m)
+          this.createMarker(m);
         } else {
           const placeObj = buildPlaceObj(place, this.user);
           db.ref('finds').push(placeObj).then((pushed) => {
@@ -249,9 +249,9 @@ export default {
               placeObj.users,
               this.globalMap,
               this.infoWindow,
-              this.globalMarkers
+              this.globalMarkers,
             );
-            this.createMarker(m)
+            this.createMarker(m);
           });
         }
       });
@@ -279,9 +279,9 @@ export default {
         p.users,
         this.globalMap,
         this.infoWindow,
-        this.globalMarkers
+        this.globalMarkers,
       );
-      this.createMarker(m)
+      this.createMarker(m);
       this.globalMap.panTo(latLng);
       this.infoWindow.el.open(this.globalMap, m);
       this.infoWindow.content = p.place;

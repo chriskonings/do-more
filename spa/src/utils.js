@@ -8,7 +8,7 @@ const utils = {
   newMarker(p, users, map, iw, markers) {
     let marker;
     const userCount = users ? Object.keys(users).length : 0;
-    const markerCount = markers ? markers.length : 0
+    const markerCount = markers ? markers.length : 0;
     const place = p.place ? p.place : p;
     const lat = p.place ? p.place.pos.lat : p.coordinates.latitude;
     const lng = p.place ? p.place.pos.lng : p.coordinates.longitude;
