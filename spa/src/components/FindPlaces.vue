@@ -69,7 +69,6 @@ export default {
       sortBy: 'best_match'
     };
   },
-
   methods: {
     deletePlace(place, key) {
       db.ref('finds/' + key)

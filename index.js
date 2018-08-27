@@ -45,6 +45,9 @@ app.get('/getPlaceUsers', function(req, res) {
   Promise.all(promises).then( p => {
     const users = p.map(p => p && p.users)
     res.json(users)
+  }).catch(e => {
+    res.json(e)
+    console.log(e);
   });
   return res
 })

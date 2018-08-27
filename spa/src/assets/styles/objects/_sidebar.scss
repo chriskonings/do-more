@@ -12,3 +12,12 @@
     flex: 1;
   }
 }
+
+.o-aside--fullscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  display: block;
+  width: 100%;
+}

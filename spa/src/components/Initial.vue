@@ -67,7 +67,8 @@
         </div>
       </div>
     </main>
-    <aside v-if="google" class="o-aside">
+    <aside v-if="google" class="o-aside" :class="{'o-aside--fullscreen': isMapFullscreen}">
+      <button @click="isMapFullscreen = false">Close</button>
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
@@ -75,6 +76,7 @@
         :google="google"
       />
     </aside>
+    <MobileMapBtn @fullscreenMap="fullscreenMap"/>
     <InfoWindow
       ref="infoW"
       :place="infoWindow.content"
@@ -92,6 +94,7 @@ import MyFinds from './MyFinds';
 import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
+import MobileMapBtn from './MobileMapBtn'
 import { db } from '../firebase';
 
 function getUser(user) {
@@ -190,6 +193,7 @@ export default {
       },
       globalMap: null,
       globalMarkers: [],
+      isMapFullscreen: false,
     };
   },
   async created() {
@@ -203,6 +207,9 @@ export default {
     });
   },
   methods: {
+    fullscreenMap() {
+      this.isMapFullscreen = true
+    },
     createMarker(marker) {
       this.globalMarkers.push(marker);
     },
@@ -320,6 +327,7 @@ export default {
     HotList,
     InfoWindow,
     User,
+    MobileMapBtn,
   },
 };
 </script>

@@ -36,12 +36,18 @@ export default {
         stylers: [
           { visibility: 'off' },
         ],
+      },{
+        featureType: 'transit',
+        elementType: 'labels.icon',
+        stylers: [{visibility: 'off'}]
       }];
       const icon = this.$utils.pinSymbol('green');
       this.map = new google.maps.Map(this.$refs.map, {
         zoom: 15,
         center: this.position,
         mapTypeControl: false,
+        fullscreenControl: false,
+        streetViewControl: false,
         styles: myStyles,
       });
       this.getLocation();

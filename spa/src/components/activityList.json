@@ -10,7 +10,14 @@
     {"name": "bouldering"},
     {"name": "snowboarding"},
     {"name": "climbing"},
-    {"name": "skatehboardng"},
-    {"name": "surfing"}
+    {"name": "skateboardng"},
+    {"name": "paddleboarding"},
+    {"name": "surfing"},
+    {"name": "cycling"},
+    {"name": "football"},
+    {"name": "reading"},
+    {"name": "photography"},
+    {"name": "tennis"},
+    {"name": "swimming"}
   ]
 }

@@ -1,0 +1,16 @@
+/*
+ * components/_map-btn.scss
+ */
+
+.c-map-btn {
+  display: block;
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  background: black;
+  right: 2rem;
+  bottom: 2rem;
+  @media  screen and (min-width: 750px) {
+    display: none;
+  }
+}
