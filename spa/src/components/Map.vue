@@ -1,7 +1,12 @@
 <template>
   <div class="c-map">
     <div class="c-map__btns">
-      <button class="c-map__location-btn" @click="getLocation">
+      <button class="c-map__close-btn" @click="fullscreen">
+        <svg class="c-map__close-btn-icon" viewBox="-3 -3 30 30" width="30" height="30" xmlns="http://www.w3.org/2000/svg"><path stroke="#000" stroke-width="3" d="M2 22L22 2M2 2l20 20"/></svg>
+      </button>
+    </div>
+    <div class="c-map__btns c-map__btns--right">
+      <button class="c-map__location-btn" @click="getLocation(true)">
         <svg class="c-map__location-btn-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="38" height="37" viewBox="0 0 44 34"><defs><filter id="a" width="128%" height="128%" x="-14%" filterUnits="objectBoundingBox"><feOffset dy="2" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/><feColorMatrix in="shadowBlurOuter1" result="shadowMatrixOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/><feMerge><feMergeNode in="shadowMatrixOuter1"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path fill="#EFEFEF" fill-rule="evenodd" d="M6.67 25.25l30.45-13.58-15.23 30.35-2.61-13.71z" filter="url(#a)" transform="translate(-3 -10)"/></svg>
       </button>
       <!-- <button class="c-map__btn" @click="whereToGo">Where should I be?</button> -->
@@ -28,6 +33,9 @@ export default {
     this.initMap();
   },
   methods: {
+    fullscreen() {
+      this.$emit('fullscreenMap');
+    },
     initMap() {
       const google = this.google;
       const myStyles = [{
@@ -41,7 +49,6 @@ export default {
         elementType: 'labels.icon',
         stylers: [{visibility: 'off'}]
       }];
-      const icon = this.$utils.pinSymbol('green');
       this.map = new google.maps.Map(this.$refs.map, {
         zoom: 15,
         center: this.position,
@@ -50,7 +57,7 @@ export default {
         streetViewControl: false,
         styles: myStyles,
       });
-      this.getLocation();
+      this.getLocation(true);
       const service = new google.maps.places.PlacesService(this.map);
       google.maps.event.addListener(this.map, 'click', (event) => {
         if (event.placeId) {
@@ -79,13 +86,12 @@ export default {
           });
         }
       });
-      this.yourPin = new google.maps.Marker({ icon });
     },
-    getLocation() {
+    getLocation(highAccuracy) {
       const google = this.google;
       if (navigator.geolocation) {
         const options = {
-          enableHighAccuracy: true,
+          enableHighAccuracy: highAccuracy,
           timeout: 10000,
           maximumAge: 0,
         };
@@ -96,15 +102,19 @@ export default {
           this.placeMyPosPin(crd.latitude, crd.longitude);
         }, (err) => {
           console.warn(`ERROR(${err.code}): ${err.message}`);
+          if (err.code === 3) {
+            this.getLocation(false)
+          }
         }, options);
       }
     },
     async placeMyPosPin(lat, lng) {
       const google = this.google;
+      const icon = this.$utils.pinSymbol();
       if (this.myPosPin) this.myPosPin.setMap(null);
       this.myPosPin = new google.maps.Marker({
         position: { lat, lng },
-        icon: this.$utils.pinSymbol('green'),
+        icon,
         animation: google.maps.Animation.DROP,
       });
       this.myPosPin.setMap(this.map);

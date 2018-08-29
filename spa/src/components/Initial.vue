@@ -68,12 +68,12 @@
       </div>
     </main>
     <aside v-if="google" class="o-aside" :class="{'o-aside--fullscreen': isMapFullscreen}">
-      <button @click="isMapFullscreen = false">Close</button>
       <Map
         :markers="globalMarkers"
         @emitMap="updateMap"
         :infoWindow="infoWindow"
         :google="google"
+        @fullscreenMap="fullscreenMap"
       />
     </aside>
     <MobileMapBtn @fullscreenMap="fullscreenMap"/>
@@ -208,7 +208,7 @@ export default {
   },
   methods: {
     fullscreenMap() {
-      this.isMapFullscreen = true
+      this.isMapFullscreen = !this.isMapFullscreen
     },
     createMarker(marker) {
       this.globalMarkers.push(marker);

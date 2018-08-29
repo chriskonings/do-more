@@ -71,12 +71,13 @@ const utils = {
 
     return [newX, newY];
   },
-  pinSymbol(color) {
+  pinSymbol() {
     return {
-      url: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-      fillColor: color,
-      fillOpacity: 1,
-      scale: 1,
+      path: 'M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0',
+      fillColor: '#3B7AFC',
+      fillOpacity: .6,
+      strokeWeight: 0,
+      scale: .5
     };
   },
 };

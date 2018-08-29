@@ -20,4 +20,7 @@
   z-index: 99;
   display: block;
   width: 100%;
+  @media  screen and (min-width: 750px) {
+    position: relative;
+  }
 }

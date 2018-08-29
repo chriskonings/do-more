@@ -15,6 +15,12 @@
   z-index: 999;
 }
 
+.c-map__btns--right {
+  right: 1rem;
+  left: auto;
+}
+
+
 .c-map__location-btn {
   position: relative;
   cursor: pointer;
@@ -26,7 +32,29 @@
   box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.75);
 }
 
+.c-map__close-btn {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  background: none ;
+  border: 0;
+  height: 3rem;
+  width: 3rem;
+  @media  screen and (min-width: 750px) {
+    display: none;
+  }
+}
+
 .c-map__location-btn-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.c-map__close-btn-icon {
   position: absolute;
   top: 0;
   right: 0;

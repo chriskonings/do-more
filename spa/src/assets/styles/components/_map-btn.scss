@@ -3,10 +3,12 @@
  */
 
 .c-map-btn {
+  cursor: pointer;
   display: block;
   position: absolute;
   width: 4rem;
   height: 4rem;
+  border-radius: 50%;
   background: black;
   right: 2rem;
   bottom: 2rem;
