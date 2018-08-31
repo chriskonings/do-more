@@ -10,3 +10,11 @@
   text-align: left;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select,
+  textarea,
+  input {
+    font-size: 1.15rem;
+  }
+}
+
