@@ -14,11 +14,7 @@
         @panToPlace="panToPlace(g)"
         :user="user"
         :loading="loadingImgs[g.place.id]"
-        :icon="g.place.image_url"
-        :name="g.place.name"
-        :city="g.place.city"
-        :link="g.place.link"
-        :country="g.place.country"
+        :place="g.place"
         :users="g.users"
         :identifier="i"
       />

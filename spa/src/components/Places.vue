@@ -3,17 +3,15 @@
     <ul class="c-my-finds__list">
       <PlaceCard
         v-for="(p, i) in places"
+        :place="p"
+        :users="p.users"
         :key="i"
-        @hover="highlight(p, p.id, i)"
+        @panToPlace="highlight(p, p.id, i)"
         @loaded="imageLoaded(p.id)"
         @save="savePlace(p)"
         @trash="deletePlace(p, p.id)"
         :user="user"
         :loading="loadingImgs[p.id]"
-        :icon="p.image_url"
-        :name="p.name"
-        :link="p.url"
-        :users="p.users"
         :identifier="i"
       />
     </ul>
@@ -86,6 +84,7 @@ export default {
   },
   watch: {
     places(list) {
+      // loading animation
       const keys = Object.keys(this.loadingImgs);
       // eslint-disable-next-line
       list.map((p) => {

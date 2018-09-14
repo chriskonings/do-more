@@ -1,6 +1,5 @@
 <template>
   <div>
-    <label class="c-label">Location search</label>
     <span v-show="invalidPlace">Click to search</span>
     <input class="c-text-input" ref="loc" placeholder="Search Location" type="text"/>
   </div>

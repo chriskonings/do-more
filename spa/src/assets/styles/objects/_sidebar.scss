@@ -3,12 +3,14 @@
  */
 
 .o-aside {
-  display: none;
+  visibility: hidden;
+  overflow: hidden;
   flex: 0;
   background-color: #efefef;
   height: 100%;
   @media  screen and (min-width: 750px) {
-    display: initial;
+    visibility: initial;
+    overflow: auto;
     flex: 1;
   }
 }

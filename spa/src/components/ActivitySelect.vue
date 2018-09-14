@@ -1,7 +1,7 @@
 <!-- Vue component -->
 <template>
   <div>
-    <label class="c-label">Activities</label>
+    <label class="c-label">Interests</label>
     <multiselect v-model="value"
       :options="options"
       :multiple="true"
@@ -10,8 +10,8 @@
       :hide-selected="false"
       :preserve-search="true"
       placeholder="Pick some"
-      label="name"
-      track-by="name"
+      label="title"
+      track-by="alias"
       :preselect-first="false"
       :limit="3"
       :showLabels="true"
@@ -23,7 +23,7 @@
        class="c-multiselect-custom__tag"
        >
         <span class="c-multiselect-custom__tag-name">
-          {{ props.option.name }}
+          {{ props.option.title }}
         </span>
         <span
           @click="props.remove(props.option)"
@@ -43,18 +43,22 @@ import activityList from './activityList.json';
 
 export default {
   name: 'ActivitySelect',
-  props: ['getActivities'],
+  props: ['getActivities', 'initialValue'],
   components: { Multiselect },
   data() {
     return {
       value: null,
-      options: activityList.activities,
+      options: activityList,
     };
+  },
+  mounted() {
+    this.value = this.initialValue
   },
   watch: {
     value(newData) {
-      const a = newData.map(s => s.name);
-      this.$emit('getActivities', a);
+      if (newData) {
+        this.$emit('getActivities', newData);
+      }
     },
   },
 };

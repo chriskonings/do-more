@@ -1,9 +1,9 @@
 <template>
   <div>
     <Accordion label="Filter">
-      <ActivitySelect
+      <!-- <ActivitySelect
         @getActivities="getActivities"
-      />
+      /> -->
       <div>
         <label class="c-label">Order</label>
         <select v-model="sortBy" class="c-select">
@@ -26,7 +26,7 @@
       </button>
     </div>
     <Places
-      v-if="places"
+      v-if="places && places.length >= 1"
       :places="places"
       :savePlace="savePlace"
       :user="user"
@@ -38,6 +38,7 @@
       :map="map"
       :infoWindow="infoWindow"
     />
+    <div v-else-if="!searching && (places && places.length <= 0)">No Results</div>
   </div>
 </template>
 
@@ -66,7 +67,7 @@ export default {
       selected: [],
       searching: false,
       places: null,
-      sortBy: 'best_match'
+      sortBy: 'distance'
     };
   },
   methods: {
@@ -104,9 +105,11 @@ export default {
       this.searching = true
       if (this.page === 0) this.places = []
       const list = await this.buildList()
-      this.places.push(...list)
-      this.placeYelpMarkers()
-      if (this.places.length >= 25) this.page += 1
+      if (list) {
+        this.places.push(...list)
+        this.placeYelpMarkers()
+        if (this.places.length >= 25) this.page += 1
+      }
       this.searching = false
     },
     async search() {
@@ -116,18 +119,21 @@ export default {
     async buildList () {
       let places = []
       const lastStatus = null;
-      if (this.selected.length > 0) {
-        for (const s of this.selected) {
-          const results = await this.getYelpPlaces(s, this.radius, this.sortBy);
-          places.push(...results);
-        }
+      if (this.user.interests.length >= 1) {
+        const interests = this.user.interests.map(i => i.alias)
+        const results = await this.getYelpPlaces(interests.toString(), this.radius, this.sortBy);
+        places.push(...results);
       } else {
         const results = await this.getYelpPlaces(null, this.radius, this.sortBy);
         places.push(...results);
       }
-      return this.getUsers(places)
+      if(places.length >= 1) {
+        return this.getUsers(places)
+      } else {
+        return null
+      }
     },
-    async getYelpPlaces (term, radius, sortBy) {
+    async getYelpPlaces (categories, radius, sortBy) {
       const mapLat = await this.map.center.lat();
       const mapLng = await this.map.center.lng();
       try {
@@ -136,7 +142,7 @@ export default {
             lat: mapLat,
             lng: mapLng,
             offset: this.page * 25,
-            term: term,
+            categories: categories,
             radius: radius,
             sortBy: sortBy
           }
@@ -180,14 +186,17 @@ export default {
         this.$emit('createMarker', m)
       }
     },
-    getActivities(activities) {
-      this.selected = activities;
-    },
+    // getActivities(activities) {
+    //   this.selected = activities;
+    // },
   },
   watch: {
-    selected(){
-      this.page = 0
-    },
+    user: {
+      handler: () => {
+        this.page = 0
+      },
+      deep: true
+    }
   },
   components: {Accordion, ActivitySelect, Places}
 };

@@ -64,17 +64,7 @@ export default {
     },
     showUserMenu() {
       this.$emit('showUserMenu');
-    },
-    // update() {
-    //   const vm = this
-    //   this.user.updateProfile({
-    //     displayName: "Chris Konings",
-    //   }).then(function() {
-    //     console.log('successfully logged in')
-    //   }).catch(function(error) {
-    //     console.log(error)
-    //   });
-    // }
+    }
   },
 };
 </script>

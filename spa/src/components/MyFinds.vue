@@ -1,5 +1,9 @@
 <template>
   <div class="c-my-finds">
+    <ActivitySelect
+      :initialValue="user.interests"
+      @getActivities="updateInterests"
+    />
     <div class="c-my-finds__title">
       <p>Places you have discovered</p>
     </div>
@@ -13,11 +17,7 @@
         @panToPlace="panToPlace(g)"
         :user="user"
         :loading="loadingImgs[k]"
-        :icon="g.place.image_url"
-        :name="g.place.name"
-        :city="g.place.city"
-        :link="g.place.link"
-        :country="g.place.country"
+        :place="g.place"
         :users="g.users"
         :identifier="k"
       />
@@ -28,6 +28,7 @@
 <script>
 import { db } from '../firebase';
 import PlaceCard from './PlaceCard';
+import ActivitySelect from './ActivitySelect';
 
 export default {
   name: 'Myfinds',
@@ -44,6 +45,10 @@ export default {
     await this.getfinds();
   },
   methods: {
+    updateInterests(int) {
+      db.ref(`users/${this.user.uid}`).child(`interests`).set(int);
+      this.$emit('updateInterests', int)
+    },
     async getfinds() {
       this.loading = true;
       const keys = Object.keys(this.user.saved);
@@ -98,6 +103,6 @@ export default {
       this.$emit('panToPlace', p);
     },
   },
-  components: { PlaceCard },
+  components: { PlaceCard, ActivitySelect },
 };
 </script>

@@ -2,7 +2,10 @@
   <div class="o-root">
     <div v-if="!globalMap" class="spinner"></div>
     <main class="o-main" v-if="globalMap">
-      <User :user="user" @showUserMenu="menu = 3"/>
+      <User
+        :user="user"
+        @showUserMenu="menu = 3"
+      />
       <!--- user preferences here -->
       <div class="c-menu">
         <ul class="c-menu__tabs">
@@ -27,6 +30,13 @@
           </li>
         </ul>
         <div class="c-menu__cont">
+          <button
+            v-show="menu === 0"
+            @click="getLocation(true)"
+            class="c-btn c-btn--naked"
+          >
+            Get location
+          </button>
           <LocationSearch
             class="c-form__item"
             v-show="menu === 0"
@@ -63,6 +73,7 @@
             :user="user"
             :infoWindow="infoWindow"
             :markers="globalMarkers"
+            @updateInterests="updateUserInterests"
           />
         </div>
       </div>
@@ -74,6 +85,7 @@
         :infoWindow="infoWindow"
         :google="google"
         @fullscreenMap="fullscreenMap"
+        @getLocation="getLocation"
       />
     </aside>
     <MobileMapBtn @fullscreenMap="fullscreenMap"/>
@@ -120,63 +132,27 @@ function getUser(user) {
 }
 
 function buildPlaceObj(p, user) {
-  let newPlace = {};
-  if (p.place) {
-    let city = null;
-    let country = null;
-    p.place.address_components.forEach((addr) => {
-      if (addr.types.includes('locality')) {
-        city = addr.short_name;
-      } else if (addr.types.includes('country')) {
-        country = addr.short_name;
-      }
-    });
-    newPlace = {
-      users: {
-        [user.uid]: {
-          id: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        },
+  let newPlace = {
+    users: {
+      [user.uid]: {
+        id: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
       },
-      place: {
-        id: p.place.id,
-        name: p.place.name,
-        city,
-        country,
-        pos: {
-          lat: p.place.geometry.location.lat(),
-          lng: p.place.geometry.location.lng(),
-        },
-        image_url: typeof p.place.photos !== 'undefined'
-          ? p.place.photos[0].getUrl({ maxWidth: 100, maxHeight: 100 })
-          : '',
-        link: p.url,
+    },
+    place: {
+      id: p.id,
+      name: p.name,
+      city: p.location.city,
+      country: p.location.country,
+      pos: {
+        lat: p.coordinates.latitude,
+        lng: p.coordinates.longitude,
       },
-    };
-  } else {
-    newPlace = {
-      users: {
-        [user.uid]: {
-          id: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        },
-      },
-      place: {
-        id: p.id,
-        name: p.name,
-        city: p.location.city,
-        country: p.location.country,
-        pos: {
-          lat: p.coordinates.latitude,
-          lng: p.coordinates.longitude,
-        },
-        image_url: p.image_url,
-        link: p.url,
-      },
-    };
-  }
+      image_url: p.image_url,
+      link: p.url,
+    },
+  };
   return newPlace;
 }
 
@@ -194,11 +170,18 @@ export default {
       globalMap: null,
       globalMarkers: [],
       isMapFullscreen: false,
+      myPosPin: null,
     };
   },
   async created() {
     firebase.auth().onAuthStateChanged((user) => {
-      getUser(user).then((userObj) => { this.user = userObj; });
+      if (user) {
+        getUser(user).then((userObj) => {
+          this.user = userObj;
+        });
+      } else {
+        this.user = null
+      }
     });
     gm.load((google) => {
       this.infoWindow.el = new google.maps.InfoWindow({
@@ -207,6 +190,38 @@ export default {
     });
   },
   methods: {
+    getLocation(highAccuracy) {
+      const google = this.google;
+      if (navigator.geolocation) {
+        const options = {
+          enableHighAccuracy: highAccuracy,
+          timeout: 10000,
+          maximumAge: 0,
+        };
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const crd = pos.coords;
+          const panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
+          this.globalMap.panTo(panPoint);
+          this.placeMyPosPin(crd.latitude, crd.longitude);
+        }, (err) => {
+          console.warn(`ERROR(${err.code}): ${err.message}`);
+          if (err.code === 3) {
+            this.getLocation(false)
+          }
+        }, options);
+      }
+    },
+    async placeMyPosPin(lat, lng) {
+      const google = this.google;
+      const icon = this.$utils.pinSymbol();
+      if (this.myPosPin) this.myPosPin.setMap(null);
+      this.myPosPin = new google.maps.Marker({
+        position: { lat, lng },
+        icon,
+        animation: google.maps.Animation.DROP,
+      });
+      this.myPosPin.setMap(this.globalMap);
+    },
     fullscreenMap() {
       this.isMapFullscreen = !this.isMapFullscreen
     },
@@ -299,6 +314,9 @@ export default {
     updateMarkers(m) {
       this.globalMarkers = m;
     },
+    updateUserInterests(list) {
+      this.$set(this.user, 'interests', list);
+    }
     // panMap (google) {
     //   const bounds = new google.maps.LatLngBounds();
     //   for (var i = 0; i < this.globalMarkers.length; i++) {

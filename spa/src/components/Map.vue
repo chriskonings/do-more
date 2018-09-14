@@ -6,7 +6,7 @@
       </button>
     </div>
     <div class="c-map__btns c-map__btns--right">
-      <button class="c-map__location-btn" @click="getLocation(true)">
+      <button class="c-map__location-btn" @click="emitLocation()">
         <svg class="c-map__location-btn-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="38" height="37" viewBox="0 0 44 34"><defs><filter id="a" width="128%" height="128%" x="-14%" filterUnits="objectBoundingBox"><feOffset dy="2" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="2"/><feColorMatrix in="shadowBlurOuter1" result="shadowMatrixOuter1" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/><feMerge><feMergeNode in="shadowMatrixOuter1"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path fill="#EFEFEF" fill-rule="evenodd" d="M6.67 25.25l30.45-13.58-15.23 30.35-2.61-13.71z" filter="url(#a)" transform="translate(-3 -10)"/></svg>
       </button>
       <!-- <button class="c-map__btn" @click="whereToGo">Where should I be?</button> -->
@@ -33,6 +33,9 @@ export default {
     this.initMap();
   },
   methods: {
+    emitLocation() {
+      this.$emit('getLocation', true);
+    },
     fullscreen() {
       this.$emit('fullscreenMap');
     },
@@ -57,7 +60,11 @@ export default {
         streetViewControl: false,
         styles: myStyles,
       });
-      this.getLocation(true);
+      this.$emit('emitMap', this.map);
+      this.$emit('getLocation', true);
+      this.map.addListener('bounds_changed', () => {
+        this.$emit('emitMap', this.map);
+      });
       const service = new google.maps.places.PlacesService(this.map);
       google.maps.event.addListener(this.map, 'click', (event) => {
         if (event.placeId) {
@@ -87,38 +94,6 @@ export default {
         }
       });
     },
-    getLocation(highAccuracy) {
-      const google = this.google;
-      if (navigator.geolocation) {
-        const options = {
-          enableHighAccuracy: highAccuracy,
-          timeout: 10000,
-          maximumAge: 0,
-        };
-        navigator.geolocation.getCurrentPosition((pos) => {
-          const crd = pos.coords;
-          const panPoint = new google.maps.LatLng(crd.latitude, crd.longitude);
-          this.map.panTo(panPoint);
-          this.placeMyPosPin(crd.latitude, crd.longitude);
-        }, (err) => {
-          console.warn(`ERROR(${err.code}): ${err.message}`);
-          if (err.code === 3) {
-            this.getLocation(false)
-          }
-        }, options);
-      }
-    },
-    async placeMyPosPin(lat, lng) {
-      const google = this.google;
-      const icon = this.$utils.pinSymbol();
-      if (this.myPosPin) this.myPosPin.setMap(null);
-      this.myPosPin = new google.maps.Marker({
-        position: { lat, lng },
-        icon,
-        animation: google.maps.Animation.DROP,
-      });
-      this.myPosPin.setMap(this.map);
-    },
     whereToGo() {
       const google = this.google;
       const markerPositions = this.markers.map(mark => [mark.position.lat(), mark.position.lng()]);
@@ -131,11 +106,6 @@ export default {
       } else {
         this.yourPin.setMap(null);
       }
-    },
-  },
-  watch: {
-    map() {
-      this.$emit('emitMap', this.map);
     },
   },
 };
