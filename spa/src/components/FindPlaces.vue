@@ -1,5 +1,16 @@
 <template>
   <div>
+    <button
+      @click="getLocation(true)"
+      class="c-btn c-btn--naked"
+    >
+      Get location
+    </button>
+    <LocationSearch
+      class="c-form__item"
+      :map="map"
+      :google="google"
+    />
     <Accordion label="Filter">
       <!-- <ActivitySelect
         @getActivities="getActivities"
@@ -49,6 +60,7 @@ import axios from 'axios'
 import ActivitySelect from './ActivitySelect';
 import Accordion from './Accordion'
 import Places from './Places'
+import LocationSearch from './LocationSearch';
 
 export default {
   name: 'FindPlaces',
@@ -57,8 +69,8 @@ export default {
     'radius',
     'map',
     'savePlace',
-    'user',
-    'markers'
+    'markers',
+    'google'
   ],
   data() {
     return {
@@ -71,6 +83,9 @@ export default {
     };
   },
   methods: {
+    getLocation(bool) {
+      this.$emit('getLocation', bool)
+    },
     deletePlace(place, key) {
       db.ref('finds/' + key)
         .child('users')
@@ -198,7 +213,17 @@ export default {
       deep: true
     }
   },
-  components: {Accordion, ActivitySelect, Places}
+  computed:{
+    user() {
+      return this.$store.state.user
+    },
+  },
+  components: {
+    Accordion,
+    ActivitySelect,
+    Places,
+    LocationSearch
+  }
 };
 </script>
 

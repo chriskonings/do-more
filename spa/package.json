@@ -69,6 +69,7 @@
     "vue-template-compiler": "^2.5.2",
     "vue2-google-maps": "^0.8.11",
     "vuefire": "^1.4.5",
+    "vuex": "^3.0.1",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.9.1",

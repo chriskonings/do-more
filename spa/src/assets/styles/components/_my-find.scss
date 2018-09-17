@@ -9,7 +9,7 @@
 }
 
 .c-my-finds__title {
-  text-align: center;
+  border-bottom: .2rem solid #000;
 }
 
 .c-my-finds__list {
@@ -24,6 +24,9 @@
   min-height: 5rem;
   padding: 1rem;
   cursor: pointer;
+  &:first-of-type {
+    margin-top: 1rem;
+  }
   &:hover {
     background-color: #efefef;
   }
@@ -63,6 +66,10 @@
   }
 }
 
+.c-my-find__img-container--empty {
+  background-color: #000;
+}
+
 @keyframes pulse {
   0%   { opacity: 1; }
   50% { opacity: .5; }
@@ -96,10 +103,42 @@
   }
 }
 
+.c-my-find__users {
+  padding: 0;
+  list-style: none;
+  display: flex;
+  text-align: center;
+}
+
+
+.c-my-find__user {
+
+}
+
 .c-my-find__user-icon {
+  display: inline-block;
   width: 2rem;
   height: 2rem;
+  margin: .2rem;
   background-position: center;
   background-size: cover;
   border-radius: 50%;
+  transition: .3s ease;
+  &:hover {
+    zoom: 1.1;
+    opacity: .7;
+  }
+}
+
+.c-my-find__user-icon--lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+.c-my-find__user-name {
+  margin: 0;
+}
+
+.c-my-find__categories {
+  margin: 1rem auto;
 }

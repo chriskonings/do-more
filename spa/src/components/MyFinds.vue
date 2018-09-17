@@ -3,9 +3,10 @@
     <ActivitySelect
       :initialValue="user.interests"
       @getActivities="updateInterests"
+      :limit="3"
     />
     <div class="c-my-finds__title">
-      <p>Places you have discovered</p>
+      <h2>Saved</h2>
     </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-finds__list">
@@ -29,10 +30,12 @@
 import { db } from '../firebase';
 import PlaceCard from './PlaceCard';
 import ActivitySelect from './ActivitySelect';
+import { UserMixins } from './mixins/UserMixins';
 
 export default {
   name: 'Myfinds',
-  props: ['user', 'markers', 'map', 'infoWindow'],
+  props: ['markers', 'map', 'infoWindow'],
+  mixins: [UserMixins],
   data() {
     return {
       loading: false,
@@ -45,10 +48,6 @@ export default {
     await this.getfinds();
   },
   methods: {
-    updateInterests(int) {
-      db.ref(`users/${this.user.uid}`).child(`interests`).set(int);
-      this.$emit('updateInterests', int)
-    },
     async getfinds() {
       this.loading = true;
       const keys = Object.keys(this.user.saved);
@@ -101,6 +100,11 @@ export default {
     },
     panToPlace(p) {
       this.$emit('panToPlace', p);
+    },
+  },
+  computed: {
+    user() {
+      return this.$store.state.user
     },
   },
   components: { PlaceCard, ActivitySelect },

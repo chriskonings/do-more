@@ -1,9 +1,14 @@
 <template>
   <div class="o-root">
-    <div v-if="!globalMap" class="spinner"></div>
+    <!-- <Intro
+      v-if="intro"
+      :loading="loading"
+    /> -->
+    <div v-if="!google && loading" class="spinner"></div>
     <main class="o-main" v-if="globalMap">
       <User
-        :user="user"
+        :loading="loading"
+        :active="menu === 3"
         @showUserMenu="menu = 3"
       />
       <!--- user preferences here -->
@@ -20,7 +25,7 @@
           </li>
           <li class="c-menu__tab">
             <button
-              :disabled="!user"
+              :disabled="!user.uid"
               class="c-menu__tab-btn"
               @click="menu = 2"
               :class="{' c-menu__tab-btn--is-active': menu === 2}"
@@ -30,50 +35,35 @@
           </li>
         </ul>
         <div class="c-menu__cont">
-          <button
-            v-show="menu === 0"
-            @click="getLocation(true)"
-            class="c-btn c-btn--naked"
-          >
-            Get location
-          </button>
-          <LocationSearch
-            class="c-form__item"
-            v-show="menu === 0"
-            :map="globalMap"
-            :google="google"
-          />
           <FindPlaces
             v-show="menu === 0"
             @emitMarkers="updateMarkers"
             @clearMarkers="clearMarkers"
             @createMarker="createMarker"
-            :user="user"
+            @getLocation="getLocation"
             :map="globalMap"
             :radius="radius"
             :infoWindow="infoWindow"
             :savePlace="savePlace"
             :markers="globalMarkers"
+            :google="google"
           />
           <HotList
             v-if="menu === 2"
             @panToPlace="panToPlace"
             @savePlace="savePlace"
-            :user="user"
             :map="globalMap"
             :infoWindow="infoWindow"
             :markers="globalMarkers"
             @createMarker="createMarker"
           />
           <MyFinds
-            v-if="user && menu === 3"
+            v-if="menu === 3"
             @panToPlace="panToPlace"
             @createMarker="createMarker"
             :map="globalMap"
-            :user="user"
             :infoWindow="infoWindow"
             :markers="globalMarkers"
-            @updateInterests="updateUserInterests"
           />
         </div>
       </div>
@@ -100,36 +90,15 @@
 <script>
 import firebase from 'firebase';
 import Map from './Map';
-import LocationSearch from './LocationSearch';
 import FindPlaces from './FindPlaces';
 import MyFinds from './MyFinds';
 import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import MobileMapBtn from './MobileMapBtn'
+// import Intro from './Intro'
+import { UserMixins } from './mixins/UserMixins'
 import { db } from '../firebase';
-
-function getUser(user) {
-  const userObj = {
-    uid: user.uid,
-    displayName: user.displayName,
-    photoURL: user.photoURL,
-  };
-  // check if user exists in user DB, if it does return it
-  // else set the user in the DB and return
-  return db.ref(`users/${user.uid}`).once('value').then((snap) => {
-    if (snap.val()) {
-      return snap.val();
-    }
-    return db.ref(`users/${user.uid}`).set(userObj, (err) => {
-      if (err) {
-        console.log(err);
-        return err;
-      }
-      return userObj;
-    });
-  });
-}
 
 function buildPlaceObj(p, user) {
   let newPlace = {
@@ -157,11 +126,13 @@ function buildPlaceObj(p, user) {
 }
 
 export default {
-  name: 'Initial',
+  name: 'Index',
   props: ['google'],
+  mixins: [UserMixins],
   data() {
     return {
-      user: null,
+      loading: true,
+      newUser: true,
       menu: 0,
       infoWindow: {
         el: null,
@@ -170,17 +141,17 @@ export default {
       globalMap: null,
       globalMarkers: [],
       isMapFullscreen: false,
-      myPosPin: null,
+      myPosPin: null
     };
   },
   async created() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        getUser(user).then((userObj) => {
-          this.user = userObj;
+        this.getUser(user).then((userObj) => {
+          this.$store.commit('updateUser', userObj)
         });
       } else {
-        this.user = null
+        this.loading = false;
       }
     });
     gm.load((google) => {
@@ -190,6 +161,31 @@ export default {
     });
   },
   methods: {
+    getUser(user) {
+      const userObj = {
+        uid: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        interests: []
+      };
+      // check if user exists in user DB, if it does return it
+      // else set the user in the DB and return
+      return db.ref(`users/${user.uid}`).once('value').then((snap) => {
+        if (snap.val()) {
+          // this.$store.commit('setIntro', false)
+          this.loading = false;
+          return snap.val();
+        }
+        return db.ref(`users/${user.uid}`).set(userObj, (err) => {
+          if (err) {
+            console.log(err);
+            return err;
+          }
+          // this.$store.commit('setIntro', true)
+          return userObj;
+        });
+      });
+    },
     getLocation(highAccuracy) {
       const google = this.google;
       if (navigator.geolocation) {
@@ -314,9 +310,6 @@ export default {
     updateMarkers(m) {
       this.globalMarkers = m;
     },
-    updateUserInterests(list) {
-      this.$set(this.user, 'interests', list);
-    }
     // panMap (google) {
     //   const bounds = new google.maps.LatLngBounds();
     //   for (var i = 0; i < this.globalMarkers.length; i++) {
@@ -326,6 +319,12 @@ export default {
     // },
   },
   computed: {
+    user() {
+      return this.$store.state.user
+    },
+    intro() {
+      return this.$store.state.intro
+    },
     radius() {
       let radius;
       const bounds = this.globalMap.getBounds();
@@ -338,7 +337,6 @@ export default {
     },
   },
   components: {
-    LocationSearch,
     FindPlaces,
     Map,
     MyFinds,
@@ -346,6 +344,7 @@ export default {
     InfoWindow,
     User,
     MobileMapBtn,
+    // Intro,
   },
 };
 </script>

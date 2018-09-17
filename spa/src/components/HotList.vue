@@ -1,8 +1,5 @@
 <template>
   <div class="c-my-finds">
-    <div class="c-my-finds__title">
-      <p>Popular places being shared</p>
-    </div>
     <div v-if="loading" class="spinner"></div>
     <ul v-else class="c-my-finds__list">
       <PlaceCard
@@ -28,7 +25,7 @@ import PlaceCard from './PlaceCard';
 
 export default {
   name: 'HotList',
-  props: ['user', 'map', 'markers', 'infoWindow'],
+  props: ['map', 'markers', 'infoWindow'],
   data() {
     return {
       loading: false,
@@ -45,7 +42,9 @@ export default {
     },
     async getfinds() {
       this.loading = true;
-      this.$bindAsArray('finds', db.ref('finds'), null, () => { this.loading = false; });
+      this.$bindAsArray('finds', db.ref('finds'), null, () => {
+        this.loading = false;
+      });
     },
     imageLoaded(id) {
       this.$set(this.loadingImgs, id, false);
@@ -96,6 +95,9 @@ export default {
     },
   },
   computed: {
+    user() {
+      return this.$store.state.user
+    },
     sortedFinds() {
       return this.finds.slice(0).sort((a, b) => {
         const aUsers = a.users ? Object.keys(a.users).length : 0;

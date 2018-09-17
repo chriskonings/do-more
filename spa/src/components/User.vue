@@ -1,6 +1,7 @@
 <template>
-  <div class="c-user">
-    <template v-if="user">
+  <div class="c-user" :class="{'c-user__loading': loading, 'c-user__active': active}">
+    <div v-if="loading" class="spinner"></div>
+    <template v-else>
       <button
         @click.prevent="showUserMenu"
         class="c-user__details c-user__details--signed-in"
@@ -11,25 +12,10 @@
           {{user.displayName}}
         </h2>
       </button>
-      <button @click.prevent="signOut" class="c-btn c-btn--naked">
+      <button v-if="user.uid" @click.prevent="signOut" class="c-btn c-btn--naked">
         Sign out
       </button>
-      <!-- <ul>
-        <li>
-          <a @click.prevent="update" class="c-btn c-btn--link">
-            Update
-          </a>
-        </li>
-      </ul> -->
-    </template>
-    <template v-else>
-      <div class="c-user__details">
-        <h2 class="c-user__name">
-          Guest
-        </h2>
-        <span>Sign in to save places</span>
-      </div>
-      <button @click.prevent="signIn" class="c-btn c-btn--naked">
+      <button v-else @click.prevent="signIn" class="c-btn c-btn--naked">
         Sign in
       </button>
     </template>
@@ -37,34 +23,26 @@
 </template>
 
 <script>
-import firebase from 'firebase/app';
+import { UserMixins } from './mixins/UserMixins';
 
 export default {
   name: 'User',
-  props: ['user'],
+  props: ['loading', 'active'],
+  mixins: [UserMixins],
   data() {
     return {
       message: '',
     };
   },
   methods: {
-    userSettings() {
-
-    },
-    signIn() {
-      const provider = new firebase.auth.TwitterAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-    },
-    signOut() {
-      firebase.auth().signOut().then(() => {
-        console.log('signed out');
-      }).catch((error) => {
-        console.log(error);
-      });
-    },
     showUserMenu() {
       this.$emit('showUserMenu');
     }
+  },
+  computed: {
+    user() {
+      return this.$store.state.user
+    },
   },
 };
 </script>

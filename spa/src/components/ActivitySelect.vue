@@ -13,7 +13,7 @@
       label="title"
       track-by="alias"
       :preselect-first="false"
-      :limit="3"
+      :limit="limit"
       :showLabels="true"
       class="c-multiselect-custom"
     >
@@ -21,6 +21,7 @@
        slot="tag"
        slot-scope="props"
        class="c-multiselect-custom__tag"
+      :class="{ 'c-multiselect-custom__tag--lg': limit >= 4 }"
        >
         <span class="c-multiselect-custom__tag-name">
           {{ props.option.title }}
@@ -43,7 +44,7 @@ import activityList from './activityList.json';
 
 export default {
   name: 'ActivitySelect',
-  props: ['getActivities', 'initialValue'],
+  props: ['getActivities', 'initialValue', 'limit'],
   components: { Multiselect },
   data() {
     return {
@@ -60,7 +61,7 @@ export default {
         this.$emit('getActivities', newData);
       }
     },
-  },
+  }
 };
 </script>
 
