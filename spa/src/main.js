@@ -30,9 +30,23 @@ const store = new Vuex.Store({
       interests: [],
       saved: {},
     },
+    menu: 0,
+    viewingUser: {
+      uid: null,
+      displayName: null,
+      photoURL: null,
+      interests: [],
+      saved: {},
+    },
     intro: true
   },
   mutations: {
+    setViewingUser(state, user) {
+      state.viewingUser = user
+    },
+    setMenu (state, num) {
+      state.menu = num
+    },
     updateUser (state, update) {
       state.user = update
     },

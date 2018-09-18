@@ -9,14 +9,14 @@
       <User
         :loading="loading"
         :active="menu === 3"
-        @showUserMenu="menu = 3"
+        @showUserMenu="$store.commit('setMenu', 3)"
       />
       <!--- user preferences here -->
       <div class="c-menu">
         <ul class="c-menu__tabs">
           <li class="c-menu__tab">
             <button
-              @click="menu = 0"
+              @click="$store.commit('setMenu', 0)"
               class="c-menu__tab-btn"
               :class="{' c-menu__tab-btn--is-active': menu === 0}"
             >
@@ -27,7 +27,7 @@
             <button
               :disabled="!user.uid"
               class="c-menu__tab-btn"
-              @click="menu = 2"
+              @click="$store.commit('setMenu', 2)"
               :class="{' c-menu__tab-btn--is-active': menu === 2}"
             >
               Hot
@@ -65,6 +65,10 @@
             :infoWindow="infoWindow"
             :markers="globalMarkers"
           />
+          <ViewUser
+            v-if="menu === 4"
+            @panToPlace="panToPlace"
+          />
         </div>
       </div>
     </main>
@@ -96,6 +100,7 @@ import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
 import MobileMapBtn from './MobileMapBtn'
+import ViewUser from './ViewUser'
 // import Intro from './Intro'
 import { UserMixins } from './mixins/UserMixins'
 import { db } from '../firebase';
@@ -133,7 +138,6 @@ export default {
     return {
       loading: true,
       newUser: true,
-      menu: 0,
       infoWindow: {
         el: null,
         content: null,
@@ -319,6 +323,9 @@ export default {
     // },
   },
   computed: {
+    menu() {
+      return this.$store.state.menu
+    },
     user() {
       return this.$store.state.user
     },
@@ -344,6 +351,7 @@ export default {
     InfoWindow,
     User,
     MobileMapBtn,
+    ViewUser,
     // Intro,
   },
 };

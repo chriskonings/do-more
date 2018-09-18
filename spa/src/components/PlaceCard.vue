@@ -65,12 +65,14 @@
         <h4>Saved by:</h4>
         <ul class="c-my-find__users">
           <li v-for="(u, i) in users" :key="i" class="c-my-find__user">
+            <button @click.stop="getUser(u)" class="c-btn c-btn--naked">
             <div
               class="c-my-find__user-icon c-my-find__user-icon--lg"
               :title="u.displayName"
               :style="{ 'background-image': 'url(' + u.photoURL + ')' }">
             </div>
             <h5 class="c-my-find__user-name">{{u.displayName}}</h5>
+            </button>
           </li>
         </ul>
         <div class="c-my-find__categories" v-if="place.categories">
@@ -85,9 +87,11 @@
 </template>
 
 <script>
+import { UserMixins } from './mixins/UserMixins';
 
 export default {
   name: 'PlaceCard',
+  mixins: [UserMixins],
   props: [
     'user',
     'loading',
@@ -101,6 +105,11 @@ export default {
     };
   },
   methods: {
+    async getUser(u) {
+      const user = await this.getUserById(u.uid)
+      this.$store.commit('setViewingUser', user)
+      this.$store.commit('setMenu', 4)
+    },
     loaded() {
       this.$emit('loaded');
     },

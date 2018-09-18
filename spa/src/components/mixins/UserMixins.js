@@ -36,5 +36,21 @@ export const UserMixins = {
         this.$set(this.user, 'interests', interests);
       }
     },
+    getUserById(uid) {
+      return db.ref(`users/${uid}`).once('value').then((snap) => {
+        const user = snap.val();
+        return user
+      }).catch((e) => {
+        return e
+      })
+    },
+    getSavedById(key) {
+      return db.ref(`finds/${key}`).once('value').then((snap) => {
+        const place = snap.val();
+        return place
+      }).catch((e) => {
+        return e
+      })
+    }
   }
 }
