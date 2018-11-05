@@ -1,7 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import Vuex from 'vuex'
+import Vuex from 'vuex';
 import VueFire from 'vuefire';
 import App from './App';
 import router from './router';
@@ -16,7 +16,7 @@ const plugin = {
   },
 };
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 Vue.use(plugin);
 Vue.use(VueFire);
 Vue.config.productionTip = false;
@@ -38,24 +38,23 @@ const store = new Vuex.Store({
       interests: [],
       saved: {},
     },
-    intro: true
+    intro: true,
   },
   mutations: {
     setViewingUser(state, user) {
-      state.viewingUser = user
+      state.viewingUser = user;
     },
-    setMenu (state, num) {
-      state.menu = num
+    setMenu(state, num) {
+      state.menu = num;
     },
-    updateUser (state, update) {
-      state.user = update
+    updateUser(state, update) {
+      state.user = update;
     },
-    setIntro (state, bool) {
-      console.log(bool)
-      state.intro = bool
+    setIntro(state, bool) {
+      state.intro = bool;
     },
-  }
-})
+  },
+});
 
 // eslint-disable-next-line
 new Vue({

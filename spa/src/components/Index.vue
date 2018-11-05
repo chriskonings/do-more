@@ -99,14 +99,14 @@ import MyFinds from './MyFinds';
 import HotList from './HotList';
 import InfoWindow from './InfoWindow';
 import User from './User';
-import MobileMapBtn from './MobileMapBtn'
-import ViewUser from './ViewUser'
+import MobileMapBtn from './MobileMapBtn';
+import ViewUser from './ViewUser';
 // import Intro from './Intro'
-import { UserMixins } from './mixins/UserMixins'
+import { UserMixins } from './mixins/UserMixins';
 import { db } from '../firebase';
 
 function buildPlaceObj(p, user) {
-  let newPlace = {
+  const newPlace = {
     users: {
       [user.uid]: {
         id: user.uid,
@@ -145,14 +145,14 @@ export default {
       globalMap: null,
       globalMarkers: [],
       isMapFullscreen: false,
-      myPosPin: null
+      myPosPin: null,
     };
   },
   async created() {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.getUser(user).then((userObj) => {
-          this.$store.commit('updateUser', userObj)
+          this.$store.commit('updateUser', userObj);
         });
       } else {
         this.loading = false;
@@ -170,7 +170,7 @@ export default {
         uid: user.uid,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        interests: []
+        interests: [],
       };
       // check if user exists in user DB, if it does return it
       // else set the user in the DB and return
@@ -206,7 +206,7 @@ export default {
         }, (err) => {
           console.warn(`ERROR(${err.code}): ${err.message}`);
           if (err.code === 3) {
-            this.getLocation(false)
+            this.getLocation(false);
           }
         }, options);
       }
@@ -223,7 +223,7 @@ export default {
       this.myPosPin.setMap(this.globalMap);
     },
     fullscreenMap() {
-      this.isMapFullscreen = !this.isMapFullscreen
+      this.isMapFullscreen = !this.isMapFullscreen;
     },
     createMarker(marker) {
       this.globalMarkers.push(marker);
@@ -324,13 +324,13 @@ export default {
   },
   computed: {
     menu() {
-      return this.$store.state.menu
+      return this.$store.state.menu;
     },
     user() {
-      return this.$store.state.user
+      return this.$store.state.user;
     },
     intro() {
-      return this.$store.state.intro
+      return this.$store.state.intro;
     },
     radius() {
       let radius;

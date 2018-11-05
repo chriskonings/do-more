@@ -8,7 +8,7 @@
     <h2 class="c-user-badge__name">{{user.displayName}}</h2>
     <h3 class="c-user-badge__save-count">Saved: {{userSavedCount}}</h3>
     <div v-if="showInterests" class="c-user-badge__interests">Interests:
-      <span v-for="(int, idx) in user.interests">
+      <span v-for="(int, idx) in user.interests" :key="idx">
         {{int.title}}<span v-if="idx != user.interests.length - 1">, </span>
       </span>
     </div>
@@ -33,10 +33,10 @@ export default {
   },
   computed: {
     userSavedCount() {
-      return Object.keys(this.user).length
+      return Object.keys(this.user).length;
     },
   },
-  components: { }
+  components: { },
 };
 </script>
 <style lang="scss" scoped>

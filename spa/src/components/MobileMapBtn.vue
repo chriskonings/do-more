@@ -15,8 +15,8 @@ export default {
   },
   methods: {
     fullscreen() {
-      this.$emit('fullscreenMap')
-    }
+      this.$emit('fullscreenMap');
+    },
   },
   watch: { },
   computed: {

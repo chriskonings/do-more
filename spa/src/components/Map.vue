@@ -47,10 +47,10 @@ export default {
         stylers: [
           { visibility: 'off' },
         ],
-      },{
+      }, {
         featureType: 'transit',
         elementType: 'labels.icon',
-        stylers: [{visibility: 'off'}]
+        stylers: [{ visibility: 'off' }],
       }];
       this.map = new google.maps.Map(this.$refs.map, {
         zoom: 15,

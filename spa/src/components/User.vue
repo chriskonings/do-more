@@ -37,11 +37,11 @@ export default {
   methods: {
     showUserMenu() {
       this.$emit('showUserMenu');
-    }
+    },
   },
   computed: {
     user() {
-      return this.$store.state.user
+      return this.$store.state.user;
     },
   },
 };

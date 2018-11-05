@@ -20,9 +20,9 @@
 </template>
 
 <script>
-import UserBadge from './UserBadge'
-import PlaceCard from './PlaceCard'
-import { UserMixins } from './mixins/UserMixins'
+import UserBadge from './UserBadge';
+import PlaceCard from './PlaceCard';
+import { UserMixins } from './mixins/UserMixins';
 
 export default {
   name: 'ViewUser',
@@ -32,15 +32,16 @@ export default {
     return {
       loading: true,
       finds: {},
-      loadingImgs: {}
+      loadingImgs: {},
     };
   },
   mounted() {
-    const promises = Object.keys(this.user.saved).map(key => {
+    const promises = Object.keys(this.user.saved).map((key) => {
       if (this.user.saved[key]) {
         this.$set(this.loadingImgs, key, true);
         return this.getSavedById(key);
       }
+      return null;
     });
     Promise.all(promises).then((values) => {
       this.finds = values;
@@ -57,13 +58,13 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.state.user
+      return this.$store.state.user;
     },
     viewingUser() {
-      return this.$store.state.viewingUser
+      return this.$store.state.viewingUser;
     },
   },
-  components: { UserBadge, PlaceCard }
+  components: { UserBadge, PlaceCard },
 };
 </script>
 <style lang="scss" scoped>

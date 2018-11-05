@@ -96,7 +96,7 @@ export default {
   },
   computed: {
     user() {
-      return this.$store.state.user
+      return this.$store.state.user;
     },
     sortedFinds() {
       return this.finds.slice(0).sort((a, b) => {

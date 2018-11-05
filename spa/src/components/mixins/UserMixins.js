@@ -1,15 +1,11 @@
 import firebase from 'firebase/app';
 import { db } from '../../firebase';
 
+// eslint-disable-next-line
 export const UserMixins = {
-  // data() {
-  //   return {
-  //     isShowing: false
-  //   }
-  // },
   methods: {
     signIn() {
-      console.log('sign in')
+      console.log('sign in');
       const provider = new firebase.auth.TwitterAuthProvider();
       firebase.auth().signInWithRedirect(provider);
     },
@@ -23,7 +19,7 @@ export const UserMixins = {
           photoURL: null,
           interests: [],
           saved: {},
-        })
+        });
       }).catch((error) => {
         console.log(error);
       });
@@ -31,7 +27,7 @@ export const UserMixins = {
     updateInterests(interests) {
       if (this.user.uid) {
         this.$set(this.user, 'interests', interests);
-        db.ref(`users/${this.user.uid}`).child(`interests`).set(interests);
+        db.ref(`users/${this.user.uid}`).child('interests').set(interests);
       } else {
         this.$set(this.user, 'interests', interests);
       }
@@ -39,18 +35,14 @@ export const UserMixins = {
     getUserById(uid) {
       return db.ref(`users/${uid}`).once('value').then((snap) => {
         const user = snap.val();
-        return user
-      }).catch((e) => {
-        return e
-      })
+        return user;
+      }).catch(e => e);
     },
     getSavedById(key) {
       return db.ref(`finds/${key}`).once('value').then((snap) => {
         const place = snap.val();
-        return place
-      }).catch((e) => {
-        return e
-      })
-    }
-  }
-}
+        return place;
+      }).catch(e => e);
+    },
+  },
+};

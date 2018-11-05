@@ -53,7 +53,7 @@ export default {
     };
   },
   mounted() {
-    this.value = this.initialValue
+    this.value = this.initialValue;
   },
   watch: {
     value(newData) {
@@ -61,7 +61,7 @@ export default {
         this.$emit('getActivities', newData);
       }
     },
-  }
+  },
 };
 </script>
 

@@ -15,7 +15,9 @@
       </div>
       <div class="c-my-find__details">
         <div class="c-my-find__name">{{place.name}}</div>
-        <div v-if="place.city || place.country" class="c-my-find__loc">{{place.city}}, {{place.country}}</div>
+        <div v-if="place.city || place.country" class="c-my-find__loc">
+          {{place.city}}, {{place.country}}
+        </div>
         <div v-if="place.distance">{{calcDistance}}</div>
         <template v-if="users && !showingMore">
           <div v-for="(u, i) in users" :key="i" class="c-my-find__users">
@@ -106,9 +108,9 @@ export default {
   },
   methods: {
     async getUser(u) {
-      const user = await this.getUserById(u.uid)
-      this.$store.commit('setViewingUser', user)
-      this.$store.commit('setMenu', 4)
+      const user = await this.getUserById(u.uid);
+      this.$store.commit('setViewingUser', user);
+      this.$store.commit('setMenu', 4);
     },
     loaded() {
       this.$emit('loaded');
@@ -123,7 +125,7 @@ export default {
       this.$emit('hover');
     },
     panToPlace() {
-      console.log('pan')
+      console.log('pan');
       this.$emit('panToPlace');
     },
   },
@@ -133,13 +135,12 @@ export default {
       return this.users && this.users[this.user.uid];
     },
     calcDistance() {
-      const miles = Math.round( this.place.distance * 0.000621371192 ) / 10
-      const yards = Math.round( this.place.distance * 1.0936 )
+      const miles = Math.round(this.place.distance * 0.000621371192) / 10;
+      const yards = Math.round(this.place.distance * 1.0936);
       if (miles <= 0) {
-        return yards + ' yards'
-      } else {
-        return miles + ' miles'
+        return `${yards} yards`;
       }
+      return `${miles} miles`;
     },
   },
 };

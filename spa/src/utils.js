@@ -75,9 +75,9 @@ const utils = {
     return {
       path: 'M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0',
       fillColor: '#3B7AFC',
-      fillOpacity: .6,
+      fillOpacity: 0.6,
       strokeWeight: 0,
-      scale: .5
+      scale: 0.5,
     };
   },
 };
