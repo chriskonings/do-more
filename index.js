@@ -7,23 +7,18 @@ const yelp = require('yelp-fusion');
 var firebase = require('firebase-admin');
 const app = express();
 const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
-const firebaseKey = process.argv[2] ? require('./config.js').FIREBASE_KEY : process.env.FIREBASE_KEY
+const firebaseKey = process.argv[2] ? require('./config.js').FIREBASE_KEY : process.env.FIREBASE_API_KEY
 const yelpClient = yelp.client(yelpKey);
 
 if (!process.argv[2]) {
   app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
 }
 
-// app.get('*', function (req, res) {
-//   res.sendFile(__dirname + '../spa/dist/index.html')
-// })
-
-
 firebase.initializeApp({
   credential: firebase.credential.cert({
     projectId: 'do-more-ecc5c',
     clientEmail: 'firebase-adminsdk-irn1g@do-more-ecc5c.iam.gserviceaccount.com',
-    private_key: firebaseKey,
+    private_key: firebaseKey.replace(/\\n/g, '\n'),
   }),
   databaseURL: 'https://do-more-ecc5c.firebaseio.com/',
 });

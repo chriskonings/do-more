@@ -51,5 +51,6 @@ module.exports = {
   globals: {
     'gm': true,
     'FIREBASE_KEY': true,
+    'FIREBASE_API_KEY': true,
   }
 }
