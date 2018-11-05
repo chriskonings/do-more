@@ -23,5 +23,9 @@
     "firebase-admin": "^5.12.1",
     "serve-static": "^1.13.2",
     "yelp-fusion": "^2.0.3"
-  }
+  },
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  },
 }
