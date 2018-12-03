@@ -7,7 +7,7 @@ const yelp = require('yelp-fusion');
 var firebase = require('firebase-admin');
 const app = express();
 const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
-const firebaseKey = process.argv[2] ? require('./config.js').FIREBASE_KEY : process.env.FIREBASE_API_KEY
+const firebaseKey = process.argv[2] ? require('./config.js').FIREBASE_KEY : process.env.FIREBASE_KEY
 const yelpClient = yelp.client(yelpKey);
 
 if (!process.argv[2]) {
