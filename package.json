@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js dev",
-    "postinstall": "npm install --prefix spa && npm run build --prefix spa"
+    "preinstall": "npm install --prefix spa",
+    "postinstall": "npm run build --prefix spa"
   },
   "repository": {
     "type": "git",
