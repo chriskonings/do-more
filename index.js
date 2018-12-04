@@ -1,26 +1,28 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const serveStatic = require('serve-static');
 const path = require('path');
 const yelp = require('yelp-fusion');
-var firebase = require('firebase-admin');
+let firebase = require('firebase-admin');
 const app = express();
-const yelpKey = process.argv[2] ? require('./config.js').YELP_KEY : process.env.YELP_KEY
-const firebaseKey = process.argv[2] ? require('./config.js').FIREBASE_KEY : process.env.FIREBASE_KEY
+const yelpKey = process.env.YELP_KEY;
 const yelpClient = yelp.client(yelpKey);
+
+//console.log(process.env.FIREBASE_KEY.replace(/\\n/g, ''))
 
 if (!process.argv[2]) {
   app.use("/", serveStatic ( path.join (__dirname, './spa/dist')))
 }
 
 firebase.initializeApp({
-  credential: firebase.credential.cert({
-    projectId: 'do-more-ecc5c',
-    clientEmail: 'firebase-adminsdk-irn1g@do-more-ecc5c.iam.gserviceaccount.com',
-    private_key: firebaseKey.replace(/\\n/g, '\n'),
-  }),
-  databaseURL: 'https://do-more-ecc5c.firebaseio.com/',
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: "do-more-ecc5c.firebaseapp.com",
+  databaseURL: "https://do-more-ecc5c.firebaseio.com",
+  projectId: "do-more-ecc5c",
+  storageBucket: "do-more-ecc5c.appspot.com",
+  messagingSenderId: "669577878898"
 });
 
 app.get('/getPlaceUsers', function(req, res) {

@@ -36,9 +36,10 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     new webpack.DefinePlugin({
       'process.env': env,
-      'GOOGLEMAPS_KEY': env.GOOGLEMAPS_KEY,
-      'FIREBASE_API_KEY': env.FIREBASE_API_KEY,
-      'FIREBASE_KEY': env.FIREBASE_KEY
+      'GOOGLEMAPS_KEY': JSON.stringify(env.GOOGLEMAPS_KEY),
+      'FIREBASE_API_KEY': JSON.stringify(env.FIREBASE_API_KEY),
+      'FIREBASE_KEY': JSON.stringify(env.FIREBASE_KEY),
+      'YELP_KEY': JSON.stringify(env.YELP_KEY)
     }),
     new UglifyJsPlugin({
       uglifyOptions: {

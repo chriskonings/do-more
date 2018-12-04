@@ -53,7 +53,8 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       'process.env': require('../config/dev.env'),
       'GOOGLEMAPS_KEY': JSON.stringify(keys.GOOGLEMAPS_KEY),
       'FIREBASE_KEY': JSON.stringify(keys.FIREBASE_KEY),
-      'FIREBASE_API_KEY': JSON.stringify(keys.FIREBASE_API_KEY)
+      'FIREBASE_API_KEY': JSON.stringify(keys.FIREBASE_API_KEY),
+      'YELP_KEY': JSON.stringify(keys.YELP_KEY)
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
